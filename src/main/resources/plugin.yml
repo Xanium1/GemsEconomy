@@ -1,0 +1,29 @@
+name: GemsEconomy
+main: me.xanium.gemseconomy.GemsEconomy
+version: 4.0
+author: Xanium
+description: An economy plugin made for minecraft servers!
+commands:
+  gbalance:
+    description: Shows your balances
+    usage: /gbalance (Player)
+    aliases: [gbal, gmoney]
+  gbaltop:
+    description: Shows the top balances of the server
+    usage: /baltop (currency) (page)
+    aliases: [gmoneytop, gecotop, gtop]
+  gcurrencies:
+    description: Manage the currencies.
+    usage: /gcurrencies
+    aliases: [gcurr, gemscurrencies, gcurrency]
+  geco:
+    description: Give, set or take currency.
+    usage: /geco <set|take|give> <account> <amount> (currency)
+    aliases: [gconomy]
+  gpay:
+    description: Pays another account
+    usage: /gpay <Account> <Amount> (Currency)
+  cheque:
+    usage: /cheque
+    description: Write or Redeem a cheque.
+    aliases: [note, banknote]
