@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EcoLog {
+public class EconomyLogger {
 
     private static FileWriter fw = null;
 

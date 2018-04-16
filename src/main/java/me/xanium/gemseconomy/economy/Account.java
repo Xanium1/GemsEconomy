@@ -9,7 +9,7 @@
 package me.xanium.gemseconomy.economy;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.logging.EcoLog;
+import me.xanium.gemseconomy.logging.EconomyLogger;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
@@ -33,9 +33,9 @@ public class Account {
             this.setBalance(currency, this.getBalance(currency) - amount);
             GemsEconomy.getDataStore().saveAccount(this);
             if(Bukkit.getPlayer(getUuid()) != null) {
-                EcoLog.log("Withdraw", nickname, String.valueOf(amount), null, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
+                EconomyLogger.log("Withdraw", nickname, String.valueOf(amount), null, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
             }else{
-                EcoLog.log("Withdraw", nickname, String.valueOf(amount), null, null, GemsEconomy.getInstance());
+                EconomyLogger.log("Withdraw", nickname, String.valueOf(amount), null, null, GemsEconomy.getInstance());
             }
             return true;
         }
@@ -47,9 +47,9 @@ public class Account {
             this.setBalance(currency, this.getBalance(currency) + amount);
             GemsEconomy.getDataStore().saveAccount(this);
             if(Bukkit.getPlayer(getUuid()) != null) {
-                EcoLog.log("Deposit", null, String.valueOf(amount), nickname, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
+                EconomyLogger.log("Deposit", null, String.valueOf(amount), nickname, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
             }else{
-                EcoLog.log("Deposit", null, String.valueOf(amount), nickname, null, GemsEconomy.getInstance());
+                EconomyLogger.log("Deposit", null, String.valueOf(amount), nickname, null, GemsEconomy.getInstance());
             }
             return true;
         }

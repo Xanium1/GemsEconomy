@@ -72,24 +72,15 @@ public class F {
 
     public static void getManageHelp(CommandSender sender) {
         for (String s : cfg.getStringList("Messages.managehelp")) {
-            sender.sendMessage(colorize(s));
+            sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
         }
     }
 
     public static String getBalance() {
         return getPrefix() + colorize(cfg.getString("Messages.balance"));
     }
-
-    public static String getBalanceOther() {
-        return getPrefix() + colorize(cfg.getString("Messages.balanceother"));
-    }
-
-    public static String getBalanceConsole() {
-        return getPrefix() + colorize(cfg.getString("Messages.balanceconsole"));
-    }
-
-    public static String getNegativeValue() {
-        return getPrefix() + colorize(cfg.getString("Messages.negativevalue"));
+    public static String getBalanceMultiple() {
+        return getPrefix() + colorize(cfg.getString("Messages.balance.multiple"));
     }
 
     public static String getUnvalidAmount() {
@@ -101,7 +92,7 @@ public class F {
 
     public static void getChequeHelp(CommandSender sender) {
         for (String s : cfg.getStringList("Messages.chequehelp")) {
-            sender.sendMessage(colorize(s));
+            sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
         }
     }
 
@@ -145,8 +136,32 @@ public class F {
         return colorize(cfg.getString("Messages.balance_top"));
     }
 
+    public static String getNoDefaultCurrency(){
+        return colorize(cfg.getString("Messages.noDefaultCurrency"));
+    }
+
+    public static String getBalanceNone(){
+        return colorize(cfg.getString("Messages.balance.none"));
+    }
+
     public static String getBalanceTopNoSupport(){
         return getPrefix() + colorize(cfg.getString("Messages.balance_top_nosupport"));
+    }
+
+    public static String getPayNoPerms(){
+        return getPrefix() + colorize(cfg.getString("Messages.payNoPermission"));
+    }
+
+    public static String getCurrencyNotPayable(){
+        return getPrefix() + colorize(cfg.getString("Messages.currencyNotPayable"));
+    }
+
+    public static String getAccountMissing(){
+        return getPrefix() + colorize(cfg.getString("Messages.accountMissing"));
+    }
+
+    public static String getCannotReceive(){
+        return getPrefix() + colorize(cfg.getString("Messages.cannotReceiveMoney"));
     }
 
     private static String colorize(String message) {

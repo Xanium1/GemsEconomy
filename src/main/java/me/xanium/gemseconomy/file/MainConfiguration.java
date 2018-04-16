@@ -46,6 +46,7 @@ public class MainConfiguration {
         config.addDefault("transaction_log", true);
 
         config.addDefault("mysql.database", "minecraft");
+        config.addDefault("mysql.tableprefix", "gemseconomy");
         config.addDefault("mysql.host", "localhost");
         config.addDefault("mysql.port", 3306);
         config.addDefault("mysql.username", "root");
@@ -59,16 +60,17 @@ public class MainConfiguration {
         config.addDefault("Messages.prefix", "&a&lGemsEconomy> ");
         config.addDefault("Messages.nopermission", "&7You don't have permission to do this.");
         config.addDefault("Messages.noconsole", "&7Console cannot do this.");
-        config.addDefault("Messages.balanceconsole", "&2&l>> &a/bal <user> &8- &7Shows user balance.");
-        config.addDefault("Messages.unsufficientfunds", "&7You don't have enough gems.");
-        config.addDefault("Messages.negativevalue", "&7You can't remove that much.");
         config.addDefault("Messages.unvalidamount", "&7Not a valid amount.");
         config.addDefault("Messages.unvalidpage", "&7Not a valid page number.");
         config.addDefault("Messages.pay_yourself", "&7You can't pay yourself.");
         config.addDefault("Messages.player_is_null", "&7The specified player does not exist.");
         config.addDefault("Messages.unknownCurrency", "§7Unknown Currency.");
+        config.addDefault("Messages.noDefaultCurrency", "&7No default currency.");
+        config.addDefault("Messages.accountMissing", "&7Your account is missing. Please relog the server.");
+        config.addDefault("Messages.cannotReceiveMoney", "&a{player}&7 can't receive money.");
 
         config.addDefault("Messages.managehelp", Arrays.asList(
+                "{prefix} &e&lEconomy Help",
                 "&2&l>> &a/geco give <user> <amount> [currency] &8- &7Give a player an amount of a currency.",
                 "&2&l>> &a/geco take <user> <amount> [currency] &8- &7Take an amount of a currency from a player.",
                 "&2&l>> &a/geco set <user> <amount> [currency] &8- &7Set a players amount of a currency."));
@@ -82,15 +84,19 @@ public class MainConfiguration {
 
         config.addDefault("Messages.payer", "&7You paid &a{player} &7an amount of &f{amount}&7.");
 
+        config.addDefault("Messages.payNoPermission", "&7You don't have permission to pay {currencycolor}{currency}&7.");
+        config.addDefault("Messages.currencyNotPayable", "{currencycolor}{currency} &7is not payable.");
+
         config.addDefault("Messages.add", "&7You gave &a{player}&7: {currencycolor}{amount}. ");
 
         config.addDefault("Messages.take", "&7You took {currencycolor}{amount} &7from &a{player}&7.");
 
         config.addDefault("Messages.set", "&7You set &a{player}&7's {currencycolor} &7to {currencycolor}{amount}&7.");
 
-        config.addDefault("Messages.balance", "&7Your balance is: &f{gems} &7gem(s).");
+        config.addDefault("Messages.balance", "&a{player}&7's balance is: {currencycolor}{balance}");
+        config.addDefault("Messages.balance.multiple", "&a{player}&7's balances:");
 
-        config.addDefault("Messages.balanceother", "&a{player}&7's balance is: &f{gems} &7gem(s).");
+        config.addDefault("Messages.balance.none", "&7No balances to show for &c{player}&7.");
 
         config.addDefault("Messages.balance_top_header", "&f----- {currencycolor} Top Balances for {currencyplural} &7(Page {page})&f -----");
 

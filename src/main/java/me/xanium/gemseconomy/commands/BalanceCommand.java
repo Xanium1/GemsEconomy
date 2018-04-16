@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 
 public class BalanceCommand implements CommandExecutor {
 
-    private GemsEconomy plugin = GemsEconomy.getInstance();
+    private final GemsEconomy plugin = GemsEconomy.getInstance();
 
     @Override
     public boolean onCommand(final CommandSender sender, Command command, String s, final String[] args) {
@@ -38,24 +38,25 @@ public class BalanceCommand implements CommandExecutor {
             }
             if (account != null) {
                 if (AccountManager.getCurrencies().size() == 0) {
-                    sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cNo balances to show for \"" + account.getDisplayName() + "\".");
+                    sender.sendMessage(F.getNoDefaultCurrency());
+
                 } else if (AccountManager.getCurrencies().size() == 1) {
                     Currency currency = AccountManager.getDefaultCurrency();
                     if (currency == null) {
-                        sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cNo default currency.");
+                        sender.sendMessage(F.getBalanceNone().replace("{player}", account.getNickname()));
                         return;
                     }
                     double balance = account.getBalance(currency);
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7e" + account.getDisplayName() + "'s balance: " + currency.getColor() + currency.format(balance));
+                    sender.sendMessage(F.getBalance().replace("{player}", account.getDisplayName()).replace("{currencycolor}", ""+currency.getColor()).replace("{balance}", currency.format(balance)));
                 } else {
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7e" + account.getDisplayName() + "'s balance(s):");
+                    sender.sendMessage(F.getBalanceMultiple().replace("{player}", account.getDisplayName()));
                     for (Currency currency : AccountManager.getCurrencies()) {
                         double balance = account.getBalance(currency);
-                        sender.sendMessage("\u00a7e\u00a7l[Eco]     " + currency.getColor() + currency.format(balance));
+                        sender.sendMessage("§f  " + currency.getColor() + currency.format(balance));
                     }
                 }
             } else {
-                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cAccount not found.");
+                sender.sendMessage(F.getPlayerDoesNotExist());
             }
         });
         return true;

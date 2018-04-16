@@ -31,10 +31,7 @@ public class EcoCommand implements CommandExecutor {
             }
 
             if (args.length == 0) {
-                sender.sendMessage(F.getPrefix() + "Economy Help");
-                sender.sendMessage("§2§l>> §a/geco give <user> <amount> [currency] §8- §7Give a player an amount of a currency.");
-                sender.sendMessage("§2§l>> §a/geco take <user> <amount> [currency] §8- §7Take an amount of a currency from a player.");
-                sender.sendMessage("§2§l>> §a/geco set <user> <amount> [currency] §8- §7Set a players amount of a currency.");
+                F.getManageHelp(sender);
                 return;
             }
 
@@ -73,13 +70,13 @@ public class EcoCommand implements CommandExecutor {
                             sender.sendMessage(F.getUnvalidAmount());
                             return;
                         }
-                    }
-                    try {
-                        amount = Integer.parseInt(args[2]);
-                    }
-                    catch (NumberFormatException ex) {
-                        sender.sendMessage(F.getUnvalidAmount());
-                        return;
+                    }else {
+                        try {
+                            amount = Integer.parseInt(args[2]);
+                        } catch (NumberFormatException ex) {
+                            sender.sendMessage(F.getUnvalidAmount());
+                            return;
+                        }
                     }
                     Account target = AccountManager.getAccount(args[1]);
                     if (target != null) {

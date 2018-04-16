@@ -15,7 +15,7 @@ import me.xanium.gemseconomy.data.YamlStorage;
 import me.xanium.gemseconomy.economy.Cheque;
 import me.xanium.gemseconomy.file.MainConfiguration;
 import me.xanium.gemseconomy.listeners.JoinListener;
-import me.xanium.gemseconomy.logging.EcoLog;
+import me.xanium.gemseconomy.logging.EconomyLogger;
 import me.xanium.gemseconomy.nbt.NMSVersion;
 import me.xanium.gemseconomy.utils.Metrics;
 import me.xanium.gemseconomy.utils.Updater;
@@ -55,8 +55,6 @@ public class GemsEconomy extends JavaPlugin {
         nmsVersion = new NMSVersion();
         metrics = new Metrics(this);
 
-        checkForUpdate();
-
         initializeDataStore();
 
         if(isVault()){
@@ -77,13 +75,15 @@ public class GemsEconomy extends JavaPlugin {
         getCommand("gpay").setExecutor(new PayCommand());
         getCommand("gcurrencies").setExecutor(new CurrencyCommand());
         getCommand("cheque").setExecutor(new ChequeCommand());
+
+        checkForUpdate();
     }
 
     @Override
     public void onDisable() {
 
         if(isVault()) vaultHandler.unhook();
-        if(isLogging()) EcoLog.closeLog();
+        if(isLogging()) EconomyLogger.closeLog();
 
         if (GemsEconomy.getDataStore() != null) {
             GemsEconomy.getDataStore().close();
@@ -96,15 +96,17 @@ public class GemsEconomy extends JavaPlugin {
 
         if (strategy.equalsIgnoreCase("yaml")) {
             dataStore = new YamlStorage("YAML", false, new File(getDataFolder(), "data.yml"));
+            UtilServer.consoleLog("YAML Storage selected.");
         }
         else if (strategy.equalsIgnoreCase("mysql")) {
             String host = getConfig().getString("mysql.host");
             int port = getConfig().getInt("mysql.port");
             String user = getConfig().getString("mysql.username");
             String pass = getConfig().getString("mysql.password");
-            String prefix = getConfig().getString("mysql.tableprefix-eco");
+            String prefix = getConfig().getString("mysql.tableprefix");
             String db = getConfig().getString("mysql.database");
             dataStore = new MySQLStorage("MySQL", true, host, port, user, pass, db, prefix);
+            UtilServer.consoleLog("MySQL Storage selected.");
         }
         else {
             UtilServer.consoleLog("You have not specified the correct data storing method. Check your config.yml!");
