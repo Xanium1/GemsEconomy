@@ -43,28 +43,26 @@ public class PayCommand implements CommandExecutor {
             }
             if (currency != null) {
                 double amount;
-                block22:
-                {
-                    if (!currency.isPayable()) {
-                        sender.sendMessage(F.getCurrencyNotPayable().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()));
-                        return;
-                    }
-                    if (!sender.hasPermission("gemseconomy.command.pay." + currency.getPlural().toLowerCase()) && !sender.hasPermission("gemseconomy.command.pay." + currency.getSingular().toLowerCase())) {
-                        sender.sendMessage(F.getPayNoPerms().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()));
-                        return;
-                    }
-                    if (currency.isDecimalSupported()) {
-                        try {
-                            amount = Double.parseDouble(args[1]);
-                            if (amount <= 0.0) {
-                                throw new NumberFormatException();
-                            }
-                            break block22;
-                        } catch (NumberFormatException ex) {
-                            sender.sendMessage(F.getUnvalidAmount());
-                            return;
+
+                if (!currency.isPayable()) {
+                    sender.sendMessage(F.getCurrencyNotPayable().replace("{currencycolor}", "" + currency.getColor()).replace("{currency}", currency.getPlural()));
+                    return;
+                }
+                if (!sender.hasPermission("gemseconomy.command.pay." + currency.getPlural().toLowerCase()) && !sender.hasPermission("gemseconomy.command.pay." + currency.getSingular().toLowerCase())) {
+                    sender.sendMessage(F.getPayNoPerms().replace("{currencycolor}", "" + currency.getColor()).replace("{currency}", currency.getPlural()));
+                    return;
+                }
+                if (currency.isDecimalSupported()) {
+                    try {
+                        amount = Double.parseDouble(args[1]);
+                        if (amount <= 0.0) {
+                            throw new NumberFormatException();
                         }
+                    } catch (NumberFormatException ex) {
+                        sender.sendMessage(F.getUnvalidAmount());
+                        return;
                     }
+                } else {
                     try {
                         amount = Integer.parseInt(args[1]);
                         if (amount <= 0.0) {
@@ -79,21 +77,21 @@ public class PayCommand implements CommandExecutor {
                 if (account != null) {
                     Account target = AccountManager.getAccount(args[0]);
                     if (target != null) {
-                        if(target.getUuid() != account.getUuid()) {
+                        if (target.getUuid() != account.getUuid()) {
                             if (target.isCanReceiveCurrency()) {
                                 if (account.getBalance(currency) >= amount) {
                                     account.setBalance(currency, account.getBalance(currency) - amount);
                                     target.setBalance(currency, target.getBalance(currency) + amount);
                                     GemsEconomy.getDataStore().saveAccount(account);
                                     GemsEconomy.getDataStore().saveAccount(target);
-                                    sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aYou sent " + currency.getColor() + currency.format(amount) + "\u00a7a to " + target.getDisplayName() + ".");
+                                    sender.sendMessage(F.getPayerMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", target.getDisplayName()));
                                 } else {
-                                    sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cYou don't have enough " + currency.getPlural() + " to pay " + target.getDisplayName() + ".");
+                                    sender.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()));
                                 }
                             } else {
                                 sender.sendMessage(F.getCannotReceive().replace("{player}", target.getDisplayName()));
                             }
-                        }else{
+                        } else {
                             sender.sendMessage(F.getPayYourself());
                         }
                     } else {

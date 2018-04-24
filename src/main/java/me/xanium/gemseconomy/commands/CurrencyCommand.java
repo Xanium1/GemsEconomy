@@ -23,37 +23,27 @@ package me.xanium.gemseconomy.commands;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.file.F;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
 public class CurrencyCommand implements CommandExecutor {
 
-    public boolean onCommand(CommandSender sender, Command command, String s124, String[] args) {
-        new BukkitRunnable(){
+    private final GemsEconomy plugin = GemsEconomy.getInstance();
 
-            public void run() {
-                if (!sender.hasPermission("eco.currencies")) {
-                    sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cYou don't have permission to manage currencies.");
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String s124, String[] args) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                if (!sender.hasPermission("gemseconomy.command.currency")) {
+                    sender.sendMessage(F.getNoPerms());
                     return;
                 }
                 if (args.length == 0) {
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7eCurrency Management");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency create \u00a77<Singular> <Plural>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency delete \u00a77<Name>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency view \u00a77<Name>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency list");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency symbol \u00a77<Name> <Char|Remove>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency color \u00a77<Name> <ChatColor>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency decimals \u00a77<Name>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency payable \u00a77<Name>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency default \u00a77<Name>");
-                    sender.sendMessage("\u00a7e\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b/currency startingbal \u00a77<Name> <Amount>");
+                    F.sendCurrencyUsage(sender);
                 } else {
                     String cmd = args[0];
                     if (cmd.equalsIgnoreCase("create")) {
@@ -62,41 +52,41 @@ public class CurrencyCommand implements CommandExecutor {
                             String plural = args[2];
                             if (AccountManager.getCurrency(single) == null && AccountManager.getCurrency(plural) == null) {
                                 Currency currency = new Currency(UUID.randomUUID(), single, plural);
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aCreated currency: " + currency.getPlural());
+                                sender.sendMessage("§a§l[Eco] §aCreated currency: " + currency.getPlural());
                                 AccountManager.getCurrencies().add(currency);
                                 if (AccountManager.getCurrencies().size() == 1) {
                                     currency.setDefaultCurrency(true);
                                 }
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cCurrency already exists.");
+                                sender.sendMessage("Currency already exists.");
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Create());
                         }
                     } else if (cmd.equalsIgnoreCase("list")) {
-                        sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aThere are \u00a7f" + AccountManager.getCurrencies().size() + "\u00a7a currencies.");
+                        sender.sendMessage(F.getPrefix() + "&7There are §f" + AccountManager.getCurrencies().size() + "§7 currencies.");
                         for (Currency currency : AccountManager.getCurrencies()) {
-                            sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7b\u00a7l-> \u00a7b" + currency.getSingular());
+                            sender.sendMessage("§a§l>> §e" + currency.getSingular());
                         }
                     } else if (cmd.equalsIgnoreCase("view")) {
                         if (args.length == 2) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aInfo for " + currency.getUuid().toString());
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aSingular: \u00a7f" + currency.getSingular() + "\u00a7a, Plural: \u00a7f" + currency.getPlural());
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aNew players start with \u00a7f" + currency.format(currency.getDefaultBalance()) + "\u00a7a.");
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aDecimals? \u00a7f" + (currency.isDecimalSupported() ? "Yes" : "No"));
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aDefault? \u00a7f" + (currency.isDefaultCurrency() ? "Yes" : "No"));
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aPayable? \u00a7f" + (currency.isPayable() ? "Yes" : "No"));
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aColor: " + (Object)currency.getColor() + currency.getColor().name());
+                                sender.sendMessage(F.getPrefix() + "§aInfo for " + currency.getUuid().toString());
+                                sender.sendMessage(F.getPrefix() + "§aSingular: §f" + currency.getSingular() + "§a, Plural: §f" + currency.getPlural());
+                                sender.sendMessage(F.getPrefix() + "§aNew players start with §f" + currency.format(currency.getDefaultBalance()) + "§a.");
+                                sender.sendMessage(F.getPrefix() + "§aDecimals? §f" + (currency.isDecimalSupported() ? "Yes" : "No"));
+                                sender.sendMessage(F.getPrefix() + "§aDefault? §f" + (currency.isDefaultCurrency() ? "Yes" : "No"));
+                                sender.sendMessage(F.getPrefix() + "§aPayable? §f" + (currency.isPayable() ? "Yes" : "No"));
+                                sender.sendMessage(F.getPrefix() + "§aColor: " + currency.getColor() + currency.getColor().name());
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_View());
                         }
-                    } else if (cmd.equalsIgnoreCase("startingbal")) {
+                    } else if (cmd.equalsIgnoreCase("startbal")) {
                         if (args.length == 3) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
@@ -111,7 +101,7 @@ public class CurrencyCommand implements CommandExecutor {
                                             break block76;
                                         }
                                         catch (NumberFormatException ex) {
-                                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cPlease provide a valid amount.");
+                                            sender.sendMessage(F.getUnvalidAmount());
                                             return;
                                         }
                                     }
@@ -122,41 +112,58 @@ public class CurrencyCommand implements CommandExecutor {
                                         }
                                     }
                                     catch (NumberFormatException ex) {
-                                        sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cPlease provide a valid amount.");
+                                        sender.sendMessage(F.getUnvalidAmount());
                                         return;
                                     }
                                 }
                                 currency.setDefaultBalance(amount);
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aStarting balance for " + currency.getPlural() + " set: " + currency.getDefaultBalance());
+                                sender.sendMessage(F.getPrefix() + "§7Starting balance for §f" + currency.getPlural() + " §7set: §a" + currency.getDefaultBalance());
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Startbal());
                         }
                     } else if (cmd.equalsIgnoreCase("color")) {
                         if (args.length == 3) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
                                 try {
-                                    ChatColor color = ChatColor.valueOf((String)args[2].toUpperCase());
+                                    ChatColor color = ChatColor.valueOf(args[2].toUpperCase());
                                     if (color.isFormat()) {
                                         throw new Exception();
                                     }
                                     currency.setColor(color);
-                                    sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aColor for " + currency.getPlural() + " updated: " + (Object)color + color.name());
+                                    sender.sendMessage(F.getPrefix() + "§7Color for §f" + currency.getPlural() + " §7updated: " + color + color.name());
                                     GemsEconomy.getDataStore().saveCurrency(currency);
                                 }
                                 catch (Exception ex) {
-                                    sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cInvalid chat color.");
+                                    sender.sendMessage(F.getPrefix() + "§cInvalid chat color.");
                                 }
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Color());
                         }
+                    } else if(cmd.equalsIgnoreCase("colorlist")){
+                        sender.sendMessage("§0§lBLACK §7= black");
+                        sender.sendMessage("§1§lDARK BLUE §7= dark_blue");
+                        sender.sendMessage("§2§lDARK GREEN §7= dark_green");
+                        sender.sendMessage("§3§lDARK AQUA §7= dark_aqua");
+                        sender.sendMessage("§4§lDARK RED §7= dark_red");
+                        sender.sendMessage("§5§lDARK PURPLE §7= dark_purple");
+                        sender.sendMessage("§6§lGOLD §7= gold");
+                        sender.sendMessage("§7§lGRAY §7= gray");
+                        sender.sendMessage("§8§lDARK GRAY §7= dark_gray");
+                        sender.sendMessage("§9§lBLUE §7= blue");
+                        sender.sendMessage("§a§lGREEN §7= green");
+                        sender.sendMessage("§b§lAQUA §7= aqua");
+                        sender.sendMessage("§c§lRED §7= red");
+                        sender.sendMessage("§d§lLIGHT PURPLE §7= light_purple");
+                        sender.sendMessage("§e§lYELLOW §7= yellow");
+                        sender.sendMessage("§f§lWHITE §7= white|reset");
                     } else if (cmd.equalsIgnoreCase("symbol")) {
                         if (args.length == 3) {
                             Currency currency = AccountManager.getCurrency(args[1]);
@@ -164,20 +171,20 @@ public class CurrencyCommand implements CommandExecutor {
                                 String symbol = args[2];
                                 if (symbol.equalsIgnoreCase("remove")) {
                                     currency.setSymbol(null);
-                                    sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aCurrency symbol removed for " + currency.getPlural());
+                                    sender.sendMessage(F.getPrefix() + "§7Currency symbol removed for §a" + currency.getPlural());
                                     GemsEconomy.getDataStore().saveCurrency(currency);
                                 } else if (symbol.length() == 1) {
                                     currency.setSymbol(symbol);
-                                    sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aCurrency symbol for " + currency.getPlural() + " updated: " + symbol);
+                                    sender.sendMessage(F.getPrefix() + "§7Currency symbol for §f" + currency.getPlural() + " §7updated: §a" + symbol);
                                     GemsEconomy.getDataStore().saveCurrency(currency);
                                 } else {
-                                    sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cSymbol must be 1 character, or say \"remove\".");
+                                    sender.sendMessage(F.getPrefix() + "§7Symbol must be 1 character, or remove it with \"remove\".");
                                 }
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Symbol());
                         }
                     } else if (cmd.equalsIgnoreCase("default")) {
                         if (args.length == 2) {
@@ -189,63 +196,60 @@ public class CurrencyCommand implements CommandExecutor {
                                     GemsEconomy.getDataStore().saveCurrency(c);
                                 }
                                 currency.setDefaultCurrency(true);
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aSet default currency to " + currency.getPlural());
+                                sender.sendMessage(F.getPrefix() + "§7Set default currency to §a" + currency.getPlural());
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Default());
                         }
                     } else if (cmd.equalsIgnoreCase("payable")) {
                         if (args.length == 2) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
                                 currency.setPayable(!currency.isPayable());
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aToggled payability for " + currency.getPlural() + ": " + currency.isPayable());
+                                sender.sendMessage(F.getPrefix() + "§7Toggled payability for §f" + currency.getPlural() + "§7: " + (currency.isPayable() ? "§aYes" : "§cNo"));
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Payable());
                         }
                     } else if (cmd.equalsIgnoreCase("decimals")) {
                         if (args.length == 2) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
                                 currency.setDecimalSupported(!currency.isDecimalSupported());
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aToggled Decimal Support for " + currency.getPlural() + ": " + currency.isDecimalSupported());
+                                sender.sendMessage(F.getPrefix() + "§7Toggled Decimal Support for §f" + currency.getPlural() + "§7: " + (currency.isDecimalSupported() ? "§aYes" : "§cNo"));
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Decimals());
                         }
                     } else if (cmd.equalsIgnoreCase("delete")) {
                         if (args.length == 2) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
-                                AccountManager.getAccounts().stream().filter(account -> account.getBalances().containsKey(currency)).forEach(account -> {
-                                    account.getBalances().remove(currency);
-                                }
-                                );
+                                AccountManager.getAccounts().stream().filter(account -> account.getBalances().containsKey(currency)).forEach(account -> account.getBalances().remove(currency));
                                 GemsEconomy.getDataStore().deleteCurrency(currency);
                                 AccountManager.getCurrencies().remove(currency);
-                                sender.sendMessage("\u00a7a\u00a7l[Eco] \u00a7aDeleted currency: " + currency.getPlural());
+                                sender.sendMessage(F.getPrefix() + "§7Deleted currency: §a" + currency.getPlural());
                             } else {
-                                sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency.");
+                                sender.sendMessage(F.getUnknownCurrency());
                             }
                         } else {
-                            sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUsage: \u00a7f/currency create <Singular> <Plural>");
+                            sender.sendMessage(F.getCurrencyUsage_Delete());
                         }
                     } else {
-                        sender.sendMessage("\u00a7c\u00a7l[Eco] \u00a7cUnknown currency sub-command.");
+                        sender.sendMessage("Unknown currency sub-command.");
                     }
                 }
-            }
-        }.runTaskAsynchronously((Plugin)GemsEconomy.getInstance());
+
+        });
         return true;
     }
 

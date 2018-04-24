@@ -14,8 +14,9 @@ import me.xanium.gemseconomy.data.MySQLStorage;
 import me.xanium.gemseconomy.data.YamlStorage;
 import me.xanium.gemseconomy.economy.Cheque;
 import me.xanium.gemseconomy.file.MainConfiguration;
-import me.xanium.gemseconomy.listeners.JoinListener;
+import me.xanium.gemseconomy.listeners.EconomyListener;
 import me.xanium.gemseconomy.logging.EconomyLogger;
+import me.xanium.gemseconomy.migration.MigrationListener;
 import me.xanium.gemseconomy.nbt.NMSVersion;
 import me.xanium.gemseconomy.utils.Metrics;
 import me.xanium.gemseconomy.utils.Updater;
@@ -62,13 +63,14 @@ public class GemsEconomy extends JavaPlugin {
             vaultHandler.hook();
             UtilServer.consoleLog("Vault compatibility enabled.");
         }else{
-            UtilServer.consoleLog("Vault compat is disabled.");
+            UtilServer.consoleLog("Vault compatibility is disabled.");
         }
 
         Cheque.setChequeBase();
 
 
-        getServer().getPluginManager().registerEvents(new JoinListener(), this);
+        getServer().getPluginManager().registerEvents(new EconomyListener(), this);
+        getServer().getPluginManager().registerEvents(new MigrationListener(), this);
         getCommand("gbalance").setExecutor(new BalanceCommand());
         getCommand("gbaltop").setExecutor(new BalTopCommand());
         getCommand("geco").setExecutor(new EcoCommand());

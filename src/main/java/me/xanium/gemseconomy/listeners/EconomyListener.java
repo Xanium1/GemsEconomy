@@ -35,7 +35,9 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class JoinListener implements Listener {
+public class EconomyListener implements Listener {
+
+    private final GemsEconomy plugin = GemsEconomy.getInstance();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
@@ -54,20 +56,18 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        GemsEconomy.getInstance().getServer().getScheduler().runTaskAsynchronously(GemsEconomy.getInstance(), () -> {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             Account account = AccountManager.getAccount(player);
             if (account != null) {
                 AccountManager.getAccounts().remove(account);
             }
-
         });
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        GemsEconomy.getInstance().getServer().getScheduler().runTaskAsynchronously(GemsEconomy.getInstance(), () -> {
-
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             Account account = AccountManager.getAccount(player);
             if (account != null && player.isOnline() && !AccountManager.getAccounts().contains(account)) {
                 AccountManager.getAccounts().add(account);

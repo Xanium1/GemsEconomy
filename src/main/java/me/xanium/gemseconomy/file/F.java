@@ -13,10 +13,29 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class F {
 
     private static GemsEconomy plugin = GemsEconomy.getInstance();
     private static FileConfiguration cfg = plugin.getConfig();
+
+    private static String get(String path){
+        return colorize(cfg.getString(path));
+    }
+
+    private static List<String> getList(String path){
+        List<String> str = new ArrayList<>();
+        for(String s : cfg.getStringList(path)){
+            str.add(colorize(s));
+        }
+        return str;
+    }
+
+    private static String colorize(String message) {
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 
     public static String getPrefix() {
         return colorize(cfg.getString("Messages.prefix"));
@@ -30,16 +49,14 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.noconsole"));
     }
 
-    public static String getPaidMessage() {
-        return getPrefix() + colorize(cfg.getString("Messages.paid"));
-    }
+    public static String getInsufficientFunds() { return getPrefix() + colorize(cfg.getString("Messages.insufficientFunds")); }
 
     public static String getPayerMessage() {
         return getPrefix() + colorize(cfg.getString("Messages.payer"));
     }
 
     public static String getPayUsage() {
-        return getPrefix() + colorize(cfg.getString("Messages.pay_usage"));
+        return colorize(cfg.getString("Messages.pay_usage"));
     }
 
     public static String getAddMessage() {
@@ -54,21 +71,13 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.set"));
     }
 
-    public static String getPlayerDoesNotExist() {
-        return getPrefix() + colorize(cfg.getString("Messages.player_is_null"));
-    }
-
-    public static String getUnsufficientfunds() {
-        return getPrefix() + colorize(cfg.getString("Messages.unsufficientfunds"));
-    }
+    public static String getPlayerDoesNotExist() { return getPrefix() + colorize(cfg.getString("Messages.player_is_null")); }
 
     public static String getPayYourself() {
         return getPrefix() + colorize(cfg.getString("Messages.pay_yourself"));
     }
 
-    public static String getUnknownCurrency() {
-        return getPrefix() + colorize(cfg.getString("Messages.unknownCurrency"));
-    }
+    public static String getUnknownCurrency() { return getPrefix() + colorize(cfg.getString("Messages.unknownCurrency")); }
 
     public static void getManageHelp(CommandSender sender) {
         for (String s : cfg.getStringList("Messages.managehelp")) {
@@ -79,15 +88,13 @@ public class F {
     public static String getBalance() {
         return getPrefix() + colorize(cfg.getString("Messages.balance"));
     }
-    public static String getBalanceMultiple() {
-        return getPrefix() + colorize(cfg.getString("Messages.balance.multiple"));
-    }
+    public static String getBalanceMultiple() { return getPrefix() + colorize(cfg.getString("Messages.balance.multiple")); }
 
     public static String getUnvalidAmount() {
-        return getPrefix() + colorize(cfg.getString("Messages.unvalidamount"));
+        return getPrefix() + colorize(cfg.getString("Messages.invalidamount"));
     }
     public static String getUnvalidPage() {
-        return getPrefix() + colorize(cfg.getString("Messages.unvalidpage"));
+        return getPrefix() + colorize(cfg.getString("Messages.invalidpage"));
     }
 
     public static void getChequeHelp(CommandSender sender) {
@@ -100,24 +107,22 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.cheque_success"));
     }
 
-    public static String getChequeRedeemed() {
-        return getPrefix() + colorize(cfg.getString("Messages.cheque_redeemed"));
-    }
+    public static String getChequeRedeemed() { return getPrefix() + colorize(cfg.getString("Messages.cheque_redeemed")); }
 
     public static String getChequeInvalid() {
         return getPrefix() + colorize(cfg.getString("Messages.cheque_invalid"));
     }
 
     public static String getGiveUsage(){
-        return getPrefix() + colorize(cfg.getString("Messages.give_usage"));
+        return colorize(cfg.getString("Messages.give_usage"));
     }
 
     public static String getTakeUsage(){
-        return getPrefix() + colorize(cfg.getString("Messages.take_usage"));
+        return colorize(cfg.getString("Messages.take_usage"));
     }
 
     public static String getSetUsage(){
-        return getPrefix() + colorize(cfg.getString("Messages.set_usage"));
+        return colorize(cfg.getString("Messages.set_usage"));
     }
 
     public static String getBalanceTopHeader(){
@@ -164,7 +169,23 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.cannotReceiveMoney"));
     }
 
-    private static String colorize(String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
+
+    public static String getCurrencyUsage_Create() { return get("Messages.usage.currency_create"); }
+    public static String getCurrencyUsage_Delete() { return get("Messages.usage.currency_delete"); }
+    public static String getCurrencyUsage_View() { return get("Messages.usage.currency_view"); }
+    public static String getCurrencyUsage_Default() { return get("Messages.usage.currency_default"); }
+    public static String getCurrencyUsage_List() { return get("Messages.usage.currency_list"); }
+    public static String getCurrencyUsage_Color() { return get("Messages.usage.currency_color"); }
+    public static String getCurrencyUsage_Colorlist() { return get("Messages.usage.currency_colorlist"); }
+    public static String getCurrencyUsage_Payable() { return get("Messages.usage.currency_payable"); }
+    public static String getCurrencyUsage_Startbal() { return get("Messages.usage.currency_startbal"); }
+    public static String getCurrencyUsage_Decimals() { return get("Messages.usage.currency_decimals"); }
+    public static String getCurrencyUsage_Symbol() { return get("Messages.usage.currency_symbol"); }
+
+    public static void sendCurrencyUsage(CommandSender sender){
+        for(String s : getList("Messages.currency_help")){
+            sender.sendMessage(s.replace("{prefix}", getPrefix()));
+        }
     }
+
 }

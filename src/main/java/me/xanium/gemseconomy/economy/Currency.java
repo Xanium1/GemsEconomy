@@ -8,6 +8,7 @@
 
 package me.xanium.gemseconomy.economy;
 
+import me.xanium.gemseconomy.utils.UtilString;
 import org.bukkit.ChatColor;
 
 import java.text.NumberFormat;
@@ -65,8 +66,7 @@ public class Currency {
             amt.append(this.getSymbol());
         }
         if (this.isDecimalSupported()) {
-            NumberFormat nf = NumberFormat.getCurrencyInstance();
-            amt.append(nf.format(amount).substring(1));
+            amt.append(UtilString.format(amount));
         } else {
             String v = String.valueOf(amount);
             String[] vv = v.split(".");

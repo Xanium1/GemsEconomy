@@ -17,8 +17,7 @@ public class UtilServer {
     private static Server getServer(){
         return Bukkit.getServer();
     }
-    private static final long MB = 1048576L;
-    private static final String Console_Prefix = "§2[GemsEco] §f";
+    private static final String Console_Prefix = "§2[GemsEconomy] §f";
 
     public static void consoleLog(String message){
         getServer().getConsoleSender().sendMessage(Console_Prefix + colorize(message));
