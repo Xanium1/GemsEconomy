@@ -26,6 +26,7 @@ package me.xanium.gemseconomy.listeners;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
+import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,6 +74,10 @@ public class EconomyListener implements Listener {
                 AccountManager.getAccounts().add(account);
             }
         });
+
+        if(AccountManager.getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency") )){
+            player.sendMessage(F.getPrefix() + "§cYou have not made a currency yet. Please do so by \"§f/gcurr§c\".");
+        }
     }
 
 }

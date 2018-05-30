@@ -56,7 +56,7 @@ public class F {
     }
 
     public static String getPayUsage() {
-        return colorize(cfg.getString("Messages.pay_usage"));
+        return colorize(cfg.getString("Messages.usage.pay_command"));
     }
 
     public static String getAddMessage() {
@@ -80,13 +80,13 @@ public class F {
     public static String getUnknownCurrency() { return getPrefix() + colorize(cfg.getString("Messages.unknownCurrency")); }
 
     public static void getManageHelp(CommandSender sender) {
-        for (String s : cfg.getStringList("Messages.managehelp")) {
+        for (String s : cfg.getStringList("Messages.help.eco_command")) {
             sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
         }
     }
 
     public static String getBalance() {
-        return getPrefix() + colorize(cfg.getString("Messages.balance"));
+        return getPrefix() + colorize(cfg.getString("Messages.balance.current"));
     }
     public static String getBalanceMultiple() { return getPrefix() + colorize(cfg.getString("Messages.balance.multiple")); }
 
@@ -98,7 +98,7 @@ public class F {
     }
 
     public static void getChequeHelp(CommandSender sender) {
-        for (String s : cfg.getStringList("Messages.chequehelp")) {
+        for (String s : cfg.getStringList("Messages.help.cheque_command")) {
             sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
         }
     }
@@ -126,15 +126,15 @@ public class F {
     }
 
     public static String getBalanceTopHeader(){
-        return colorize(cfg.getString("Messages.balance_top_header"));
+        return colorize(cfg.getString("Messages.balance_top.header"));
     }
 
     public static String getBalanceTopEmpty(){
-        return colorize(cfg.getString("Messages.balance_top_empty"));
+        return colorize(cfg.getString("Messages.balance_top.empty"));
     }
 
     public static String getBalanceTopNext(){
-        return colorize(cfg.getString("Messages.balance_top_next"));
+        return colorize(cfg.getString("Messages.balance_top.next"));
     }
 
     public static String getBalanceTop(){
@@ -142,15 +142,15 @@ public class F {
     }
 
     public static String getNoDefaultCurrency(){
-        return colorize(cfg.getString("Messages.noDefaultCurrency"));
+        return getPrefix() + colorize(cfg.getString("Messages.noDefaultCurrency"));
     }
 
     public static String getBalanceNone(){
-        return colorize(cfg.getString("Messages.balance.none"));
+        return getPrefix() + colorize(cfg.getString("Messages.balance.none"));
     }
 
     public static String getBalanceTopNoSupport(){
-        return getPrefix() + colorize(cfg.getString("Messages.balance_top_nosupport"));
+        return getPrefix() + colorize(cfg.getString("Messages.balance_top.nosupport"));
     }
 
     public static String getPayNoPerms(){
@@ -183,7 +183,7 @@ public class F {
     public static String getCurrencyUsage_Symbol() { return get("Messages.usage.currency_symbol"); }
 
     public static void sendCurrencyUsage(CommandSender sender){
-        for(String s : getList("Messages.currency_help")){
+        for(String s : getList("Messages.help.currency_command")){
             sender.sendMessage(s.replace("{prefix}", getPrefix()));
         }
     }

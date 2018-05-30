@@ -28,13 +28,17 @@ public class MigrationListener implements Listener {
 
             UserConfig user = UserConfig.getInstance();
 
-            if (user.getConfig(player.getUniqueId()).getString("UniqueID") != null) {
+            if (user.getConfig(player.getUniqueId()).getString("UniqueID") != null && !user.getConfig(player.getUniqueId()).getBoolean("Migrated")) {
 
                 Account account = AccountManager.getAccount(player.getUniqueId());
                 Currency def = AccountManager.getDefaultCurrency();
 
-                account.deposit(def, user.getConfig(player.getUniqueId()).getDouble("Balance"));
-                player.sendMessage(F.getPrefix() + "Your old account were migrated to the new system!");
+                double amount = Math.round(user.getConfig(player.getUniqueId()).getDouble("Balance"));
+
+                account.deposit(def, amount);
+                user.getConfig(player.getUniqueId()).set("Migrated", true);
+                user.saveUser(player.getUniqueId());
+                player.sendMessage(F.getPrefix() + "§aYour old account were migrated to the new system!");
             }
 
         }

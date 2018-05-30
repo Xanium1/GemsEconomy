@@ -93,7 +93,7 @@ public class EcoCommand implements CommandExecutor {
                     sender.sendMessage(F.getUnknownCurrency());
                 }
             } else {
-                sender.sendMessage("unknown command");
+                sender.sendMessage(F.getPrefix() + "§cUnknown command");
             }
 
         });

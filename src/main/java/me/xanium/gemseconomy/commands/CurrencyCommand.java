@@ -52,20 +52,20 @@ public class CurrencyCommand implements CommandExecutor {
                             String plural = args[2];
                             if (AccountManager.getCurrency(single) == null && AccountManager.getCurrency(plural) == null) {
                                 Currency currency = new Currency(UUID.randomUUID(), single, plural);
-                                sender.sendMessage("§a§l[Eco] §aCreated currency: " + currency.getPlural());
+                                sender.sendMessage(F.getPrefix() + "§7Created currency: §a" + currency.getPlural());
                                 AccountManager.getCurrencies().add(currency);
                                 if (AccountManager.getCurrencies().size() == 1) {
                                     currency.setDefaultCurrency(true);
                                 }
                                 GemsEconomy.getDataStore().saveCurrency(currency);
                             } else {
-                                sender.sendMessage("Currency already exists.");
+                                sender.sendMessage(F.getPrefix() + "§cCurrency already exists.");
                             }
                         } else {
                             sender.sendMessage(F.getCurrencyUsage_Create());
                         }
                     } else if (cmd.equalsIgnoreCase("list")) {
-                        sender.sendMessage(F.getPrefix() + "&7There are §f" + AccountManager.getCurrencies().size() + "§7 currencies.");
+                        sender.sendMessage(F.getPrefix() + "§7There are §f" + AccountManager.getCurrencies().size() + "§7 currencies.");
                         for (Currency currency : AccountManager.getCurrencies()) {
                             sender.sendMessage("§a§l>> §e" + currency.getSingular());
                         }
@@ -73,13 +73,13 @@ public class CurrencyCommand implements CommandExecutor {
                         if (args.length == 2) {
                             Currency currency = AccountManager.getCurrency(args[1]);
                             if (currency != null) {
-                                sender.sendMessage(F.getPrefix() + "§aInfo for " + currency.getUuid().toString());
-                                sender.sendMessage(F.getPrefix() + "§aSingular: §f" + currency.getSingular() + "§a, Plural: §f" + currency.getPlural());
-                                sender.sendMessage(F.getPrefix() + "§aNew players start with §f" + currency.format(currency.getDefaultBalance()) + "§a.");
-                                sender.sendMessage(F.getPrefix() + "§aDecimals? §f" + (currency.isDecimalSupported() ? "Yes" : "No"));
-                                sender.sendMessage(F.getPrefix() + "§aDefault? §f" + (currency.isDefaultCurrency() ? "Yes" : "No"));
-                                sender.sendMessage(F.getPrefix() + "§aPayable? §f" + (currency.isPayable() ? "Yes" : "No"));
-                                sender.sendMessage(F.getPrefix() + "§aColor: " + currency.getColor() + currency.getColor().name());
+                                sender.sendMessage(F.getPrefix() + "§7ID: §c" + currency.getUuid().toString());
+                                sender.sendMessage(F.getPrefix() + "§7Singular: §a" + currency.getSingular() + "§7, Plural: §a" + currency.getPlural());
+                                sender.sendMessage(F.getPrefix() + "§7Start Balance: " + currency.getColor() + currency.format(currency.getDefaultBalance()) + "§7.");
+                                sender.sendMessage(F.getPrefix() + "§7Decimals: " + (currency.isDecimalSupported() ? "§aYes" : "§cNo"));
+                                sender.sendMessage(F.getPrefix() + "§7Default: " + (currency.isDefaultCurrency() ? "§aYes" : "§cNo"));
+                                sender.sendMessage(F.getPrefix() + "§7Payable: " + (currency.isPayable() ? "§aYes" : "§cNo"));
+                                sender.sendMessage(F.getPrefix() + "§7Color: " + currency.getColor() + currency.getColor().name());
                             } else {
                                 sender.sendMessage(F.getUnknownCurrency());
                             }
@@ -245,7 +245,7 @@ public class CurrencyCommand implements CommandExecutor {
                             sender.sendMessage(F.getCurrencyUsage_Delete());
                         }
                     } else {
-                        sender.sendMessage("Unknown currency sub-command.");
+                        sender.sendMessage(F.getPrefix() + "§cUnknown currency sub-command.");
                     }
                 }
 

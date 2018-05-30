@@ -1,6 +1,6 @@
 name: GemsEconomy
 main: me.xanium.gemseconomy.GemsEconomy
-version: 4.0
+version: 4.1
 author: Xanium
 description: An economy plugin made for minecraft servers!
 commands:

@@ -64,13 +64,4 @@ public class UtilString {
         return original.substring(0, 1).toUpperCase() + original.substring(1);
     }
 
-    public static boolean isInteger(String s){
-        try{
-            Integer.parseInt(s);
-            return true;
-        }catch(NumberFormatException e){
-            return false;
-        }
-    }
-
 }

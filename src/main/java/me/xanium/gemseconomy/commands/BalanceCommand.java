@@ -52,7 +52,7 @@ public class BalanceCommand implements CommandExecutor {
                     sender.sendMessage(F.getBalanceMultiple().replace("{player}", account.getDisplayName()));
                     for (Currency currency : AccountManager.getCurrencies()) {
                         double balance = account.getBalance(currency);
-                        sender.sendMessage("§f  " + currency.getColor() + currency.format(balance));
+                        sender.sendMessage("§a§l>> " + currency.getColor() + currency.format(balance));
                     }
                 }
             } else {
