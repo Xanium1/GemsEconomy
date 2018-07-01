@@ -105,5 +105,17 @@ public class GemsEconomyAPI {
         }
     }
 
+    /**
+     *
+     * @param name - Currency name.
+     * @return - Currency Object.
+     */
+    public Currency getCurrency(String name){
+        if(AccountManager.getCurrency(name) != null){
+            return AccountManager.getCurrency(name);
+        }
+        return null;
+    }
+
 
 }

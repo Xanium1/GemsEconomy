@@ -35,13 +35,13 @@ public class EcoCommand implements CommandExecutor {
                 return;
             }
 
-            if (args[0].equalsIgnoreCase("give")) {
+            if (args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("add")) {
                 if (!sender.hasPermission("gemseconomy.command.give")) {
                     sender.sendMessage(F.getNoPerms());
                     return;
                 }
                 changeBalance(sender, args, false);
-            } else if (args[0].equalsIgnoreCase("take")) {
+            } else if (args[0].equalsIgnoreCase("take") || args[0].equalsIgnoreCase("remove")) {
                 if (!sender.hasPermission("gemseconomy.command.take")) {
                     sender.sendMessage(F.getNoPerms());
                     return;

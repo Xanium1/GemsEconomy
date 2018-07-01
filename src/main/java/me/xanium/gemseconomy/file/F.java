@@ -104,25 +104,25 @@ public class F {
     }
 
     public static String getChequeSucess() {
-        return getPrefix() + colorize(cfg.getString("Messages.cheque_success"));
+        return getPrefix() + colorize(cfg.getString("Messages.cheque.success"));
     }
 
-    public static String getChequeRedeemed() { return getPrefix() + colorize(cfg.getString("Messages.cheque_redeemed")); }
+    public static String getChequeRedeemed() { return getPrefix() + colorize(cfg.getString("Messages.cheque.redeemed")); }
 
     public static String getChequeInvalid() {
-        return getPrefix() + colorize(cfg.getString("Messages.cheque_invalid"));
+        return getPrefix() + colorize(cfg.getString("Messages.cheque.invalid"));
     }
 
     public static String getGiveUsage(){
-        return colorize(cfg.getString("Messages.give_usage"));
+        return colorize(cfg.getString("Messages.usage.give_command"));
     }
 
     public static String getTakeUsage(){
-        return colorize(cfg.getString("Messages.take_usage"));
+        return colorize(cfg.getString("Messages.usage.take_command"));
     }
 
     public static String getSetUsage(){
-        return colorize(cfg.getString("Messages.set_usage"));
+        return colorize(cfg.getString("Messages.usage.set_command"));
     }
 
     public static String getBalanceTopHeader(){

@@ -81,14 +81,17 @@ public class MainConfiguration {
         config.addDefault("Messages.add", "&7You gave &a{player}&7: {currencycolor}{amount}. ");
         config.addDefault("Messages.take", "&7You took {currencycolor}{amount} &7from &a{player}&7.");
         config.addDefault("Messages.set", "&7You set &a{player}&7's {currencycolor} &7to {currencycolor}{amount}&7.");
+
         config.addDefault("Messages.balance.current", "&a{player}&7's balance is: {currencycolor}{balance}");
         config.addDefault("Messages.balance.multiple", "&a{player}&7's balances:");
         config.addDefault("Messages.balance.none", "&7No balances to show for &c{player}&7.");
+
+        config.addDefault("Messages.balance_top", "&a&l-> {number}. {currencycolor}{player} &7- {currencycolor}{currencysymbol}{balance}");
         config.addDefault("Messages.balance_top.header", "&f----- {currencycolor} Top Balances for {currencyplural} &7(Page {page})&f -----");
         config.addDefault("Messages.balance_top.empty", "&7No accounts to display.");
         config.addDefault("Messages.balance_top.next", "{currencycolor}/gbaltop {currencyplural} {page} &7for more.");
-        config.addDefault("Messages.balance_top", "&a&l-> {number}. {currencycolor}{player} &7- {currencycolor}{currencysymbol}{balance}");
         config.addDefault("Messages.balance_top.nosupport", "&a{storage} &7doesn't support /baltop.");
+
         config.addDefault("Messages.cheque.success", "&7Cheque successfully written.");
         config.addDefault("Messages.cheque.redeemed", "&7Cheque has been cashed in.");
         config.addDefault("Messages.cheque.invalid", "&7This is not a valid cheque.");
