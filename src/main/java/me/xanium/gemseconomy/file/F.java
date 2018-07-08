@@ -55,6 +55,10 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.payer"));
     }
 
+    public static String getPaidMessage() {
+        return getPrefix() + colorize(cfg.getString("Messages.paid"));
+    }
+
     public static String getPayUsage() {
         return colorize(cfg.getString("Messages.usage.pay_command"));
     }

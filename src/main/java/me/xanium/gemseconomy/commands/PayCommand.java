@@ -13,6 +13,7 @@ import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
 import me.xanium.gemseconomy.file.F;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -84,6 +85,9 @@ public class PayCommand implements CommandExecutor {
                                     target.setBalance(currency, target.getBalance(currency) + amount);
                                     GemsEconomy.getDataStore().saveAccount(account);
                                     GemsEconomy.getDataStore().saveAccount(target);
+                                    if(Bukkit.getPlayer(target.getUuid()) != null){
+                                        Bukkit.getPlayer(target.getUuid()).sendMessage(F.getPaidMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", sender.getName()));
+                                    }
                                     sender.sendMessage(F.getPayerMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", target.getDisplayName()));
                                 } else {
                                     sender.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()));
