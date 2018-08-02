@@ -7,7 +7,6 @@
  */
 package me.xanium.gemseconomy.data;
 
-import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class YamlStorage extends DataStore {
 
@@ -35,7 +33,7 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public void initalize() {
+    public void initialize() {
         if (!getFile().exists()) {
             try {
                 if (getFile().createNewFile()) {

@@ -17,8 +17,8 @@ import java.util.UUID;
 
 public class AccountManager {
 
-    private static List<Account> accounts = new ArrayList<Account>();
-    private static List<Currency> currencies = new ArrayList<Currency>();
+    private static List<Account> accounts = new ArrayList<>();
+    private static List<Currency> currencies = new ArrayList<>();
 
     public static Currency getDefaultCurrency() {
         for (Currency currency : AccountManager.getCurrencies()) {

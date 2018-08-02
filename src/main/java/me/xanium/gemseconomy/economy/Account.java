@@ -43,6 +43,7 @@ public class Account {
     }
 
     public boolean deposit(Currency currency, double amount) {
+
         if (this.isCanReceiveCurrency()) {
             this.setBalance(currency, this.getBalance(currency) + amount);
             GemsEconomy.getDataStore().saveAccount(this);

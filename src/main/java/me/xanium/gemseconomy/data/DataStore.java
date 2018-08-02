@@ -6,9 +6,6 @@
  * Thank you.
  */
 
-/*
- * Decompiled with CFR 0_123.
- */
 package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.economy.Account;
@@ -22,30 +19,30 @@ public abstract class DataStore {
     private String name;
     private boolean topSupported;
 
-    public DataStore(final String name, final boolean topSupported) {
+    public DataStore(String name, boolean topSupported) {
         this.name = name;
         this.topSupported = topSupported;
     }
 
-    public abstract void initalize();
+    public abstract void initialize();
 
     public abstract void close();
 
     public abstract void loadCurrencies();
 
-    public abstract void saveCurrency(final Currency p0);
+    public abstract void saveCurrency(Currency currency);
 
-    public abstract void deleteCurrency(final Currency p0);
+    public abstract void deleteCurrency(Currency currency);
 
-    public abstract Map<String, Double> getTopList(final Currency p0, final int p1, final int p2);
+    public abstract Map<String, Double> getTopList(Currency currency, int offset, int amount);
 
-    public abstract Account loadAccount(final String p0);
+    public abstract Account loadAccount(String string);
 
-    public abstract Account loadAccount(final UUID p0);
+    public abstract Account loadAccount(UUID uuid);
 
-    public abstract void saveAccount(final Account p0);
+    public abstract void saveAccount(Account account);
 
-    public abstract void deleteAccount(final Account p0);
+    public abstract void deleteAccount(Account account);
 
     public String getName() {
         return this.name;

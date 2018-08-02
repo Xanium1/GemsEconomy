@@ -47,7 +47,7 @@ public class EconomyListener implements Listener {
             account = new Account(event.getUniqueId(), event.getName());
             GemsEconomy.getDataStore().saveAccount(account);
             UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
-        } else if ((account.getNickname() != null && !account.getNickname().equals(event.getName())) || account.getNickname() == null) {
+        } else if (!account.getNickname().equals(event.getName()) || account.getNickname() == null) {
             account.setNickname(event.getName());
             GemsEconomy.getDataStore().saveAccount(account);
             UtilServer.consoleLog("Name change found! Updating user " + account.getDisplayName() + "...");

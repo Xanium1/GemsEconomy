@@ -30,7 +30,7 @@ public class MainConfiguration {
         config.options().header(plugin.getDescription().getName()
                 + "\n"
                 + "Version: " + plugin.getDescription().getVersion()
-                + "\nGemsEco Main Configuration file."
+                + "\nGemsEconomy Main Configuration file."
                 + "\n"
                 + "Developer(s): " + plugin.getDescription().getAuthors()
                 + "\n\n"

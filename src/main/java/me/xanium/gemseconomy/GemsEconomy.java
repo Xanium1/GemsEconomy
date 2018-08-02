@@ -68,7 +68,6 @@ public class GemsEconomy extends JavaPlugin {
 
         Cheque.setChequeBase();
 
-
         getServer().getPluginManager().registerEvents(new EconomyListener(), this);
         getServer().getPluginManager().registerEvents(new MigrationListener(), this);
         getCommand("gbalance").setExecutor(new BalanceCommand());
@@ -116,7 +115,7 @@ public class GemsEconomy extends JavaPlugin {
             return;
         }
 
-        getDataStore().initalize();
+        getDataStore().initialize();
 
         if (dataStore instanceof MySQLStorage) {
             if (((MySQLStorage) dataStore).getConnection() == null) {

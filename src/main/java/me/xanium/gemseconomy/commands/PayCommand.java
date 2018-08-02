@@ -38,6 +38,11 @@ public class PayCommand implements CommandExecutor {
                 sender.sendMessage(F.getPayUsage());
                 return;
             }
+            if(AccountManager.getDefaultCurrency() == null){
+                sender.sendMessage(F.getNoDefaultCurrency());
+                return;
+            }
+
             Currency currency = AccountManager.getDefaultCurrency();
             if (args.length == 3) {
                 currency = AccountManager.getCurrency(args[2]);
