@@ -30,7 +30,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Map;
 
-public class BalTopCommand implements CommandExecutor {
+public class BalanceTopCommand implements CommandExecutor {
 
     private final GemsEconomy plugin = GemsEconomy.getInstance();
     private static final int ACCOUNTS_PER_PAGE = 10;

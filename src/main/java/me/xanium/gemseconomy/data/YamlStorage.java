@@ -18,6 +18,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -52,8 +53,7 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public void close() {
-    }
+    public void close() {}
 
     @Override
     public void loadCurrencies() {
@@ -71,7 +71,9 @@ public class YamlStorage extends DataStore {
                 currency.setDefaultCurrency(getConfig().getBoolean(path + ".defaultcurrency"));
                 currency.setPayable(getConfig().getBoolean(path + ".payable"));
                 currency.setSymbol(getConfig().getString(path + ".symbol"));
+                currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
                 AccountManager.getCurrencies().add(currency);
+                UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }
         }
     }
@@ -87,6 +89,7 @@ public class YamlStorage extends DataStore {
         getConfig().set(path + ".defaultcurrency", currency.isDefaultCurrency());
         getConfig().set(path + ".payable", currency.isPayable());
         getConfig().set(path + ".color", currency.getColor().name());
+        getConfig().set(path + ".exchange_rate", currency.getExchangeRate());
         try {
             getConfig().save(getFile());
         } catch (IOException e) {
@@ -129,6 +132,19 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
+    public ArrayList<Account> getOfflineAccounts() {
+        String path = "accounts";
+        ArrayList<Account> accounts = new ArrayList<>();
+        for(String uuid : getConfig().getConfigurationSection(path).getKeys(false)){
+            Account acc = loadAccount(UUID.fromString(uuid));
+            loadBalances(acc);
+            UtilServer.consoleLog("Balances: " + acc.getBalances().toString());
+            accounts.add(acc);
+        }
+        return accounts;
+    }
+
+    @Override
     public Account loadAccount(String name) {
         ConfigurationSection section = getConfig().getConfigurationSection("accounts");
         if (section != null) {
@@ -148,6 +164,9 @@ public class YamlStorage extends DataStore {
         }
         return null;
     }
+
+    @Override
+    public void createAccount(Account account) {}
 
     @Override
     public Account loadAccount(UUID uuid) {

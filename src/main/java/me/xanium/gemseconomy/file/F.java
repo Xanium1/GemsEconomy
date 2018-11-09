@@ -51,6 +51,8 @@ public class F {
 
     public static String getInsufficientFunds() { return getPrefix() + colorize(cfg.getString("Messages.insufficientFunds")); }
 
+    public static String getTargetInsufficientFunds() { return getPrefix() + colorize(cfg.getString("Messages.targetInsufficientFunds")); }
+
     public static String getPayerMessage() {
         return getPrefix() + colorize(cfg.getString("Messages.payer"));
     }
@@ -85,6 +87,12 @@ public class F {
 
     public static void getManageHelp(CommandSender sender) {
         for (String s : cfg.getStringList("Messages.help.eco_command")) {
+            sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
+        }
+    }
+
+    public static void getExchangeHelp(CommandSender sender) {
+        for (String s : cfg.getStringList("Messages.help.exchange_command")) {
             sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
         }
     }
@@ -185,6 +193,7 @@ public class F {
     public static String getCurrencyUsage_Startbal() { return get("Messages.usage.currency_startbal"); }
     public static String getCurrencyUsage_Decimals() { return get("Messages.usage.currency_decimals"); }
     public static String getCurrencyUsage_Symbol() { return get("Messages.usage.currency_symbol"); }
+    public static String getCurrencyUsage_Rate() { return get("Messages.usage.currency_setrate"); }
 
     public static void sendCurrencyUsage(CommandSender sender){
         for(String s : getList("Messages.help.currency_command")){
@@ -192,4 +201,11 @@ public class F {
         }
     }
 
+    public static String getExchangeSuccess(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_success"));
+    }
+
+    public static String getExchangeRateSet(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_rate_set"));
+    }
 }

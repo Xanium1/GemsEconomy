@@ -17,7 +17,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class EcoCommand implements CommandExecutor {
+public class EconomyCommand implements CommandExecutor {
 
     private final GemsEconomy plugin = GemsEconomy.getInstance();
 
@@ -100,8 +100,8 @@ public class EcoCommand implements CommandExecutor {
         return true;
     }
 
-    private void changeBalance(CommandSender sender, String[] args, boolean withdraw){
-        if(!withdraw){
+    private void changeBalance(CommandSender sender, String[] args, boolean withdraw) {
+        if (!withdraw) {
             if (args.length < 3) {
                 sender.sendMessage(F.getGiveUsage());
                 return;
@@ -112,20 +112,17 @@ public class EcoCommand implements CommandExecutor {
             }
             if (currency != null) {
                 double amount;
-                block14:
-                {
-                    if (currency.isDecimalSupported()) {
-                        try {
-                            amount = Double.parseDouble(args[2]);
-                            if (amount <= 0.0) {
-                                throw new NumberFormatException();
-                            }
-                            break block14;
-                        } catch (NumberFormatException ex) {
-                            sender.sendMessage(F.getUnvalidAmount());
-                            return;
+                if (currency.isDecimalSupported()) {
+                    try {
+                        amount = Double.parseDouble(args[2]);
+                        if (amount <= 0.0) {
+                            throw new NumberFormatException();
                         }
+                    } catch (NumberFormatException ex) {
+                        sender.sendMessage(F.getUnvalidAmount());
+                        return;
                     }
+                } else {
                     try {
                         amount = Integer.parseInt(args[2]);
                         if (amount <= 0.0) {
@@ -136,21 +133,23 @@ public class EcoCommand implements CommandExecutor {
                         return;
                     }
                 }
+
                 Account target = AccountManager.getAccount(args[1]);
                 if (target != null) {
-                    target.setBalance(currency, target.getBalance(currency) + amount);
-                    GemsEconomy.getDataStore().saveAccount(target);
-                    sender.sendMessage(F.getAddMessage()
-                            .replace("{player}", target.getNickname())
-                            .replace("{currencycolor}", currency.getColor() + "")
-                            .replace("{amount}", currency.format(amount)));
+                    if (target.deposit(currency, amount)) {
+                        GemsEconomy.getDataStore().saveAccount(target);
+                        sender.sendMessage(F.getAddMessage()
+                                .replace("{player}", target.getNickname())
+                                .replace("{currencycolor}", currency.getColor() + "")
+                                .replace("{amount}", currency.format(amount)));
+                    }
                 } else {
                     sender.sendMessage(F.getPlayerDoesNotExist());
                 }
             } else {
                 sender.sendMessage(F.getUnknownCurrency());
             }
-        }else{
+        } else {
             if (args.length < 3) {
                 sender.sendMessage(F.getTakeUsage());
                 return;
@@ -161,20 +160,18 @@ public class EcoCommand implements CommandExecutor {
             }
             if (currency != null) {
                 double amount;
-                block14:
-                {
-                    if (currency.isDecimalSupported()) {
-                        try {
-                            amount = Double.parseDouble(args[2]);
-                            if (amount <= 0.0) {
-                                throw new NumberFormatException();
-                            }
-                            break block14;
-                        } catch (NumberFormatException ex) {
-                            sender.sendMessage(F.getUnvalidAmount());
-                            return;
+
+                if (currency.isDecimalSupported()) {
+                    try {
+                        amount = Double.parseDouble(args[2]);
+                        if (amount <= 0.0) {
+                            throw new NumberFormatException();
                         }
+                    } catch (NumberFormatException ex) {
+                        sender.sendMessage(F.getUnvalidAmount());
+                        return;
                     }
+                } else {
                     try {
                         amount = Integer.parseInt(args[2]);
                         if (amount <= 0.0) {
@@ -187,12 +184,19 @@ public class EcoCommand implements CommandExecutor {
                 }
                 Account target = AccountManager.getAccount(args[1]);
                 if (target != null) {
-                    target.setBalance(currency, target.getBalance(currency) - amount);
-                    GemsEconomy.getDataStore().saveAccount(target);
-                    sender.sendMessage(F.getTakeMessage()
-                            .replace("{player}", target.getNickname())
-                            .replace("{currencycolor}", currency.getColor() + "")
-                            .replace("{amount}", currency.format(amount)));
+                    if (target.hasEnough(currency, amount)) {
+                        target.setBalance(currency, target.getBalance(currency) - amount);
+                        GemsEconomy.getDataStore().saveAccount(target);
+                        sender.sendMessage(F.getTakeMessage()
+                                .replace("{player}", target.getNickname())
+                                .replace("{currencycolor}", currency.getColor() + "")
+                                .replace("{amount}", currency.format(amount)));
+                    } else {
+                        sender.sendMessage(F.getTargetInsufficientFunds()
+                                .replace("{currencycolor}", currency.getColor() + "")
+                                .replace("{currency}", currency.getPlural())
+                                .replace("{target}", target.getDisplayName()));
+                    }
                 } else {
                     sender.sendMessage(F.getPlayerDoesNotExist());
                 }

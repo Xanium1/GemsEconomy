@@ -45,7 +45,11 @@ public class EconomyListener implements Listener {
         Account account = AccountManager.getAccount(event.getUniqueId());
         if (account == null) {
             account = new Account(event.getUniqueId(), event.getName());
-            GemsEconomy.getDataStore().saveAccount(account);
+            if(GemsEconomy.getDataStore().getName().equalsIgnoreCase("mysql")){
+                GemsEconomy.getDataStore().createAccount(account);
+            }else {
+                GemsEconomy.getDataStore().saveAccount(account);
+            }
             UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
         } else if (!account.getNickname().equals(event.getName()) || account.getNickname() == null) {
             account.setNickname(event.getName());

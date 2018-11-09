@@ -18,9 +18,14 @@ public class UtilServer {
         return Bukkit.getServer();
     }
     private static final String Console_Prefix = "§2[GemsEconomy] §f";
+    private static final String Error_Prefix = "§c[G-Eco-Error] §f";
 
     public static void consoleLog(String message){
         getServer().getConsoleSender().sendMessage(Console_Prefix + colorize(message));
+    }
+
+    public static void consoleLog(Throwable message){
+        getServer().getConsoleSender().sendMessage(Error_Prefix + message);
     }
 
     private static String colorize(String message){

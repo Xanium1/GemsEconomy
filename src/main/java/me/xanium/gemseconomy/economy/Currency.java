@@ -25,6 +25,7 @@ public class Currency {
     private boolean payable = true;
     private boolean defaultCurrency = false;
     private double defaultBalance = 0.0;
+    private double exchangeRate = 0.0;
 
     public Currency(UUID uuid, String singular, String plural) {
         this.uuid = uuid;
@@ -122,6 +123,14 @@ public class Currency {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    public double getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(double exchangeRate) {
+        this.exchangeRate = exchangeRate;
     }
 }
 

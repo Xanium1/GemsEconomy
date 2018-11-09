@@ -42,6 +42,10 @@ public class NMSVersion {
 
     public static final String V1_12_R1 = "v1_12_R1";
 
+    public static final String V1_13_R1 = "v1_13_R1";
+
+    public static final String V1_13_R2 = "v1_13_R2";
+
     private Map<Integer, String> versionMap;
 
     private int versionID;
@@ -70,7 +74,7 @@ public class NMSVersion {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "in no way accept responsibility for ANY damage caused to a server running");
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "an unsupported version of Spigot. It is recommended that you change to");
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "a supported version of Spigot. Supported versions are 1.7*, 1.8*, 1.9,");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "1.10, 1.11, 1.12. Versions marked with an asterisk (*) may have limited functionality.");
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "1.10, 1.11, 1.12, 1.13. Versions marked with an asterisk (*) may have limited functionality.");
             Bukkit.getConsoleSender().sendMessage("");
             Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "----------------------------------------------------------");
         }
@@ -90,6 +94,8 @@ public class NMSVersion {
         registerVersion(V1_10_R1);
         registerVersion(V1_11_R1);
         registerVersion(V1_12_R1);
+        registerVersion(V1_13_R1);
+        registerVersion(V1_13_R2);
     }
 
     private void registerVersion(String string) {

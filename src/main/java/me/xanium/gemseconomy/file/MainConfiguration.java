@@ -74,6 +74,7 @@ public class MainConfiguration {
         config.addDefault("Messages.accountMissing", "&7Your account is missing. Please relog the server.");
         config.addDefault("Messages.cannotReceiveMoney", "&a{player}&7 can't receive money.");
         config.addDefault("Messages.insufficientFunds", "&7You don't have enough {currencycolor}{currency}&7!");
+        config.addDefault("Messages.targetInsufficientFunds", "&e{target} &7don't have enough {currencycolor}{currency}&7!");
         config.addDefault("Messages.paid", "&7You were paid {currencycolor}{amount} &7from &a{player}&7.");
         config.addDefault("Messages.payer", "&7You paid {currencycolor}{amount} &7to &a{player}&7.");
         config.addDefault("Messages.payNoPermission", "&7You don't have permission to pay {currencycolor}{currency}&7.");
@@ -81,6 +82,8 @@ public class MainConfiguration {
         config.addDefault("Messages.add", "&7You gave &a{player}&7: {currencycolor}{amount}. ");
         config.addDefault("Messages.take", "&7You took {currencycolor}{amount} &7from &a{player}&7.");
         config.addDefault("Messages.set", "&7You set &a{player}&7's {currencycolor} &7to {currencycolor}{amount}&7.");
+        config.addDefault("Messages.exchange_rate_set", "&7Set the exchange rate for {currencycolor}{currency} &7to &a{amount}&7.");
+        config.addDefault("Messages.exchange_success", "&7Successfully exchanged {currencycolor}{exchangedCurr} ({currEx}) &7for {currencycolor2}{receivedCurr} ({amount})&7.");
 
         config.addDefault("Messages.balance.current", "&a{player}&7's balance is: {currencycolor}{balance}");
         config.addDefault("Messages.balance.multiple", "&a{player}&7's balances:");
@@ -102,6 +105,11 @@ public class MainConfiguration {
                 "&2&l>> &a/geco take <user> <amount> [currency] &8- &7Take an amount of a currency from a player.",
                 "&2&l>> &a/geco set <user> <amount> [currency] &8- &7Set a players amount of a currency."));
 
+        config.addDefault("Messages.help.exchange_command", Arrays.asList(
+                "{prefix}&b&lExchange Help",
+                "&2&l>> &a/gexchange <currencyToExchange> <amount> <currency> <amount> &8- &7Exchange between currencies with a custom rate.",
+                "&2&l>> &a/gexchange <currencyToExchange> <currency> &8- &7Exchange with a pre-set exchange rate."));
+
         config.addDefault("Messages.usage.pay_command", "&2&l>> &a/gpay <user> <amount> [currency] &8- &7Pay the specified user the specified amount.");
         config.addDefault("Messages.usage.give_command", "&2&l>> &a/geco give <user> <amount> [currency] &8- &7Give a player an amount of a currency.");
         config.addDefault("Messages.usage.take_command", "&2&l>> &a/geco take <user> <amount> [currency] &8- &7Take an amount of a currency from a player.");
@@ -114,6 +122,7 @@ public class MainConfiguration {
         config.addDefault("Messages.help.currency_command", Arrays.asList("{prefix}&e&lCurrency Help",
                 "&2&l>> &a/gcurr create <singular> <plural> &8- &7Create a currency.",
                 "&2&l>> &a/gcurr delete <plural> &8- &7Delete a currency.",
+                "&2&l>> &a/gcurr convert &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!",
                 "&2&l>> &a/gcurr view <plural> &8- &7View information about a currency.",
                 "&2&l>> &a/gcurr list &8- &7List of currencies.",
                 "&2&l>> &a/gcurr symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.",
@@ -122,10 +131,12 @@ public class MainConfiguration {
                 "&2&l>> &a/gcurr decimals <plural> &8- &7Enable decimals for a currency.",
                 "&2&l>> &a/gcurr payable <plural> &8- &7Set a currency payable or not.",
                 "&2&l>> &a/gcurr default <plural> &8- &7Set a currency as default.",
-                "&2&l>> &a/gcurr startbal <plural> <amount> &8- &7Set the starting balance for a currency."));
+                "&2&l>> &a/gcurr startbal <plural> <amount> &8- &7Set the starting balance for a currency.",
+                "&2&l>> &a/gcurr setrate <plural> <amount> &8- &7Sets the currency's exchange rate."));
 
         config.addDefault("Messages.usage.currency_create", "&2&l>> &a/gcurr create <singular> <plural> &8- &7Create a currency.");
         config.addDefault("Messages.usage.currency_delete", "&2&l>> &a/gcurr delete <plural> &8- &7Delete a currency.");
+        config.addDefault("Messages.usage.currency_convert", "&2&l>> &a/gcurr convert &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!");
         config.addDefault("Messages.usage.currency_view", "&2&l>> &a/gcurr view <plural> &8- &7View information about a currency.");
         config.addDefault("Messages.usage.currency_list", "&2&l>> &a/gcurr list &8- &7List of currencies.");
         config.addDefault("Messages.usage.currency_symbol", "&2&l>> &a/gcurr symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.");
@@ -135,6 +146,7 @@ public class MainConfiguration {
         config.addDefault("Messages.usage.currency_default", "&2&l>> &a/gcurr default <plural> &8- &7Set a currency as default.");
         config.addDefault("Messages.usage.currency_decimals", "&2&l>> &a/gcurr decimals <plural> &8- &7Enable decimals for a currency.");
         config.addDefault("Messages.usage.currency_startbal", "&2&l>> &a/gcurr startbal <plural> <amount> &8- &7Set the starting balance for a currency.");
+        config.addDefault("Messages.usage.currency_setrate", "&2&l>> &a/gcurr setrate <plural> <amount> &8- &7Sets the currency's exchange rate.");
 
         config.options().copyDefaults(true);
         plugin.saveConfig();

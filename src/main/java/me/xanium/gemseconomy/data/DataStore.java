@@ -11,6 +11,7 @@ package me.xanium.gemseconomy.data;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.Currency;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,6 +44,10 @@ public abstract class DataStore {
     public abstract void saveAccount(Account account);
 
     public abstract void deleteAccount(Account account);
+
+    public abstract void createAccount(Account account);
+
+    public abstract ArrayList<Account> getOfflineAccounts();
 
     public String getName() {
         return this.name;

@@ -1,12 +1,13 @@
 name: GemsEconomy
 main: me.xanium.gemseconomy.GemsEconomy
-version: 4.3.3
+version: 4.4
 author: Xanium
 description: An economy plugin made for minecraft servers!
+website: https://www.spigotmc.org/resources/gemseconomy.19655/
 commands:
   gbalance:
     description: Shows your balances
-    usage: /gbalance (Player)
+    usage: /gbalance (account)
     aliases: [gbal, gmoney]
   gbaltop:
     description: Shows the top balances of the server
@@ -22,8 +23,12 @@ commands:
     aliases: [gconomy]
   gpay:
     description: Pays another account
-    usage: /gpay <Account> <Amount> (Currency)
+    usage: /gpay <account> <amount> (currency)
   cheque:
     usage: /cheque
     description: Write or Redeem a cheque.
     aliases: [note, banknote]
+##  gexchange:
+ #   usage: /gexchange
+ ##   description: Exchange currencies.
+  #  aliases: [gex, gemsexchange]

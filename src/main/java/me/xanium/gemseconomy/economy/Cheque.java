@@ -20,22 +20,23 @@ import java.util.List;
 
 public class Cheque {
 
+    private static final GemsEconomy plugin = GemsEconomy.getInstance();
     private static ItemStack chequeBaseItem;
     private static String nbt_value = "value";
     private static String nbt_currency = "currency";
 
     public static void setChequeBase(){
-        ItemStack item = new ItemStack(Material.valueOf(GemsEconomy.getInstance().getConfig().getString("cheque.material")), 1);
+        ItemStack item = new ItemStack(Material.valueOf(plugin.getConfig().getString("cheque.material")), 1);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(UtilString.colorize(GemsEconomy.getInstance().getConfig().getString("cheque.name")));
-        meta.setLore(UtilString.colorize(GemsEconomy.getInstance().getConfig().getStringList("cheque.lore")));
+        meta.setDisplayName(UtilString.colorize(plugin.getConfig().getString("cheque.name")));
+        meta.setLore(UtilString.colorize(plugin.getConfig().getStringList("cheque.lore")));
         item.setItemMeta(meta);
         chequeBaseItem = item;
     }
 
     public ItemStack writeCheque(String creatorName, Currency currency, double amount) {
         if (creatorName.equals("CONSOLE")) {
-            creatorName = UtilString.colorize(GemsEconomy.getInstance().getConfig().getString("cheque.console_name"));
+            creatorName = UtilString.colorize(plugin.getConfig().getString("cheque.console_name"));
         }
         List<String> formatLore = new ArrayList<>();
 

@@ -29,8 +29,8 @@ public class Account {
     }
 
     public boolean withdraw(Currency currency, double amount) {
-        if (this.getBalance(currency) >= amount) {
-            this.setBalance(currency, this.getBalance(currency) - amount);
+        if (hasEnough(currency, amount)) {
+            setBalance(currency, getBalance(currency) - amount);
             GemsEconomy.getDataStore().saveAccount(this);
             if(Bukkit.getPlayer(getUuid()) != null) {
                 EconomyLogger.log("Withdraw", nickname, String.valueOf(amount), null, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
@@ -43,9 +43,8 @@ public class Account {
     }
 
     public boolean deposit(Currency currency, double amount) {
-
-        if (this.isCanReceiveCurrency()) {
-            this.setBalance(currency, this.getBalance(currency) + amount);
+        if (isCanReceiveCurrency()) {
+            setBalance(currency, getBalance(currency) + amount);
             GemsEconomy.getDataStore().saveAccount(this);
             if(Bukkit.getPlayer(getUuid()) != null) {
                 EconomyLogger.log("Deposit", null, String.valueOf(amount), nickname, Bukkit.getPlayer(getUuid()).getLocation(), GemsEconomy.getInstance());
@@ -58,7 +57,7 @@ public class Account {
     }
 
     public String getDisplayName() {
-        return this.getNickname() != null ? this.getNickname() : this.getUuid().toString();
+        return getNickname() != null ? getNickname() : getUuid().toString();
     }
 
     public void setNickname(String nickname) {
@@ -66,22 +65,32 @@ public class Account {
     }
 
     public String getNickname() {
-        return this.nickname;
+        return nickname;
     }
 
     public UUID getUuid() {
-        return this.uuid;
+        return uuid;
     }
 
     public void setBalance(Currency currency, double amount) {
-        this.getBalances().put(currency, amount);
+        getBalances().put(currency, amount);
+        EconomyLogger.log("Balance Set", null, String.valueOf(amount), nickname, null, GemsEconomy.getInstance());
     }
 
     public double getBalance(Currency currency) {
-        if (this.getBalances().containsKey(currency)) {
-            return this.getBalances().get(currency);
+        if (getBalances().containsKey(currency)) {
+            return getBalances().get(currency);
         }
         return currency.getDefaultBalance();
+    }
+
+    public double getBalance(String identifier){
+        for(Currency currency : getBalances().keySet()){
+            if(currency.getPlural().equalsIgnoreCase(identifier) || currency.getSingular().equalsIgnoreCase(identifier)){
+                return getBalances().get(currency);
+            }
+        }
+        return -1;
     }
 
     public boolean hasEnough(double amount){
@@ -89,14 +98,11 @@ public class Account {
     }
 
     public boolean hasEnough(Currency currency, double amount){
-        if(amount >= getBalance(currency)){
-            return false;
-        }
-        return true;
+        return getBalance(currency) >= amount;
     }
 
     public boolean isCanReceiveCurrency() {
-        return this.canReceiveCurrency;
+        return canReceiveCurrency;
     }
 
     public void setCanReceiveCurrency(boolean canReceiveCurrency) {
@@ -104,7 +110,7 @@ public class Account {
     }
 
     public Map<Currency, Double> getBalances() {
-        return this.balances;
+        return balances;
     }
 }
 

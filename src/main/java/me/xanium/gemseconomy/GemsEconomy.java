@@ -25,23 +25,32 @@ import me.xanium.gemseconomy.vault.VaultHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 
 public class GemsEconomy extends JavaPlugin {
 
-    private Metrics metrics;
     private static DataStore dataStore = null;
     private static GemsEconomy instance;
+    private VaultHandler vaultHandler;
+    private NMSVersion nmsVersion;
+    private Metrics metrics;
+
     private boolean debug = false;
     private boolean vault = false;
     private boolean logging = true;
-    private MainConfiguration mainConfiguration;
-    private VaultHandler vaultHandler;
-    private NMSVersion nmsVersion;
 
+
+    /**
+     * Todo Liste:
+     * The exchange commands and maths
+     *
+     */
+
+    //BUG: Not transferring balances while converting.
 
     @Override
     public void onLoad(){
-        mainConfiguration = new MainConfiguration(this);
+        MainConfiguration mainConfiguration = new MainConfiguration(this);
         mainConfiguration.loadDefaultConfig();
 
         setDebug(getConfig().getBoolean("debug"));
@@ -56,7 +65,19 @@ public class GemsEconomy extends JavaPlugin {
         nmsVersion = new NMSVersion();
         metrics = new Metrics(this);
 
-        initializeDataStore();
+        initializeDataStore(getConfig().getString("storage"), true);
+
+        Cheque.setChequeBase();
+
+        getServer().getPluginManager().registerEvents(new EconomyListener(), this);
+        getServer().getPluginManager().registerEvents(new MigrationListener(), this);
+        getCommand("gbalance").setExecutor(new BalanceCommand());
+        getCommand("gbaltop").setExecutor(new BalanceTopCommand());
+        getCommand("geco").setExecutor(new EconomyCommand());
+        getCommand("gpay").setExecutor(new PayCommand());
+        getCommand("gcurrencies").setExecutor(new CurrencyCommand());
+        getCommand("cheque").setExecutor(new ChequeCommand());
+        //getCommand("gexchange").setExecutor(new ExchangeCommand());
 
         if(isVault()){
             vaultHandler = new VaultHandler(this);
@@ -66,24 +87,13 @@ public class GemsEconomy extends JavaPlugin {
             UtilServer.consoleLog("Vault compatibility is disabled.");
         }
 
-        Cheque.setChequeBase();
-
-        getServer().getPluginManager().registerEvents(new EconomyListener(), this);
-        getServer().getPluginManager().registerEvents(new MigrationListener(), this);
-        getCommand("gbalance").setExecutor(new BalanceCommand());
-        getCommand("gbaltop").setExecutor(new BalTopCommand());
-        getCommand("geco").setExecutor(new EcoCommand());
-        getCommand("gpay").setExecutor(new PayCommand());
-        getCommand("gcurrencies").setExecutor(new CurrencyCommand());
-        getCommand("cheque").setExecutor(new ChequeCommand());
-
-        checkForUpdate();
+        doAsync(() -> checkForUpdate());
     }
 
     @Override
     public void onDisable() {
 
-        if(isVault()) vaultHandler.unhook();
+        if(isVault()) getVaultHandler().unhook();
         if(isLogging()) EconomyLogger.closeLog();
 
         if (GemsEconomy.getDataStore() != null) {
@@ -91,9 +101,7 @@ public class GemsEconomy extends JavaPlugin {
         }
     }
 
-    private void initializeDataStore() {
-
-        String strategy = getConfig().getString("storage");
+    public void initializeDataStore(String strategy, boolean load) {
 
         if (strategy.equalsIgnoreCase("yaml")) {
             dataStore = new YamlStorage("YAML", false, new File(getDataFolder(), "data.yml"));
@@ -124,7 +132,7 @@ public class GemsEconomy extends JavaPlugin {
                 return;
             }
         }
-        getDataStore().loadCurrencies();
+        if(load)getDataStore().loadCurrencies();
     }
 
     private void checkForUpdate() {
@@ -137,12 +145,16 @@ public class GemsEconomy extends JavaPlugin {
                 UtilServer.consoleLog("Download link: " + updater.getResourceURL());
                 UtilServer.consoleLog("--------------------------------");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             UtilServer.consoleLog("Could not check for updates! Error log will follow if debug is enabled.");
             if(isDebug()) {
-                e.printStackTrace();
+                UtilServer.consoleLog(e.getCause());
             }
         }
+    }
+
+    public static void doAsync(Runnable runnable){
+        getInstance().getServer().getScheduler().runTaskAsynchronously(getInstance(), runnable);
     }
 
     public static DataStore getDataStore() {

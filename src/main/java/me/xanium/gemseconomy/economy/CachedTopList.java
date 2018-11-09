@@ -19,7 +19,7 @@ public class CachedTopList {
     private long cacheTime;
     private LinkedHashMap<String, Double> results;
 
-    public CachedTopList(final Currency currency, final int amount, final int offset, final long cacheTime) {
+    public CachedTopList(Currency currency, int amount, int offset, long cacheTime) {
         this.results = new LinkedHashMap<>();
         this.currency = currency;
         this.amount = amount;
@@ -27,7 +27,7 @@ public class CachedTopList {
         this.cacheTime = cacheTime;
     }
 
-    public boolean matches(final Currency currency, final int offset, final int amount) {
+    public boolean matches(Currency currency, int offset, int amount) {
         return currency.getUuid().equals(this.getCurrency().getUuid()) && offset == this.getOffset() && amount == this.getAmount();
     }
 
@@ -55,7 +55,7 @@ public class CachedTopList {
         return this.results;
     }
 
-    public void setResults(final LinkedHashMap<String, Double> results) {
+    public void setResults(LinkedHashMap<String, Double> results) {
         this.results = results;
     }
 }
