@@ -135,7 +135,7 @@ public class MySQLStorage extends DataStore {
                 boolean isDefault = set.getInt("is_default") == 1;
                 boolean payable = set.getInt("payable") == 1;
                 ChatColor color = ChatColor.valueOf(set.getString("color"));
-                double exchangeRate = set.getDouble("exchange_rate");
+               // double exchangeRate = set.getDouble("exchange_rate");
                 Currency currency = new Currency(uuid, singular, plural);
                 currency.setDefaultBalance(defaultBalance);
                 currency.setSymbol(symbol);
@@ -143,7 +143,7 @@ public class MySQLStorage extends DataStore {
                 currency.setDefaultCurrency(isDefault);
                 currency.setPayable(payable);
                 currency.setColor(color);
-                currency.setExchangeRate(exchangeRate);
+                //currency.setExchangeRate(exchangeRate);
                 AccountManager.getCurrencies().add(currency);
                 UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }

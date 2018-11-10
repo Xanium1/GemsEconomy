@@ -150,7 +150,7 @@ public class F {
     }
 
     public static String getBalanceTop(){
-        return colorize(cfg.getString("Messages.balance_top"));
+        return colorize(cfg.getString("Messages.balance_top.balance"));
     }
 
     public static String getNoDefaultCurrency(){

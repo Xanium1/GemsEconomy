@@ -71,7 +71,6 @@ public class GemsEco extends AbstractEconomy {
 
     @Override
     public boolean has(OfflinePlayer player, double amount) {
-
         return has(player.getName(), amount);
     }
 
@@ -110,12 +109,12 @@ public class GemsEco extends AbstractEconomy {
         Account user = AccountManager.getAccount(player.getUniqueId());
         Currency currency = AccountManager.getDefaultCurrency();
 
-        if(user.deposit(currency, amount)){
+        if(user.withdraw(currency, amount)){
             balance = user.getBalance(currency);
             type = EconomyResponse.ResponseType.SUCCESS;
         }else{
             balance = user.getBalance(currency);
-            error = "Could not deposit " + amount + " to " + player.getName() + " because something went wrong.";
+            error = "Could not withdraw " + amount + " to " + player.getName() + " because something went wrong.";
         }
         return new EconomyResponse(amount, balance, type, error);
     }

@@ -71,7 +71,7 @@ public class YamlStorage extends DataStore {
                 currency.setDefaultCurrency(getConfig().getBoolean(path + ".defaultcurrency"));
                 currency.setPayable(getConfig().getBoolean(path + ".payable"));
                 currency.setSymbol(getConfig().getString(path + ".symbol"));
-                currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
+               // currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
                 AccountManager.getCurrencies().add(currency);
                 UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }
