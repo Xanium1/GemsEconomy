@@ -74,13 +74,8 @@ public class BalanceTopCommand implements CommandExecutor {
                 int num = (10 * (page - 1)) + 1;
                 for (String name : toplist.keySet()) {
                     double balance = toplist.get(name);
-                    sender.sendMessage(F.getBalanceTop()
-                            .replace("{number}", String.valueOf(num))
-                            .replace("{currencycolor}", ""+currency.getColor())
-                            .replace("{player}", name)
-                            .replace("{currencyplural}", currency.getPlural())
-                            .replace("{currencysymbol}", currency.getSymbol())
-                            .replace("{balance}", currency.format(balance)));
+                    sender.sendMessage(F.getBalanceTop().replace("{number}", String.valueOf(num)).replace("{currencycolor}", ""+currency.getColor())
+                            .replace("{player}", name).replace("{balance}", currency.format(balance)));
                     num++;
                 }
                 if (toplist.isEmpty()) {

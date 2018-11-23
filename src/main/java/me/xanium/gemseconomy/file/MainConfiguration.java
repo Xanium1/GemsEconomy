@@ -89,7 +89,7 @@ public class MainConfiguration {
         config.addDefault("Messages.balance.multiple", "&a{player}&7's balances:");
         config.addDefault("Messages.balance.none", "&7No balances to show for &c{player}&7.");
 
-        config.addDefault("Messages.balance_top.balance", "&a&l-> {number}. {currencycolor}{player} &7- {currencycolor}{currencysymbol}{balance}");
+        config.addDefault("Messages.balance_top.balance", "&a&l-> {number}. {currencycolor}{player} &7- {currencycolor}{balance}");
         config.addDefault("Messages.balance_top.header", "&f----- {currencycolor} Top Balances for {currencyplural} &7(Page {page})&f -----");
         config.addDefault("Messages.balance_top.empty", "&7No accounts to display.");
         config.addDefault("Messages.balance_top.next", "{currencycolor}/gbaltop {currencyplural} {page} &7for more.");
