@@ -24,7 +24,6 @@ public class ExchangeCommand implements CommandExecutor {
 
             if (args.length == 0) {
                 F.getExchangeHelp(sender);
-                return;
             } else if (args.length == 3) {
                 Currency toExchange = AccountManager.getCurrency(args[0]);
                 Currency toReceive = AccountManager.getCurrency(args[1]);

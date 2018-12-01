@@ -34,7 +34,7 @@ public class MainConfiguration {
                 + "\n"
                 + "Developer(s): " + plugin.getDescription().getAuthors()
                 + "\n\n"
-                + "You have two valid storage methods, yaml or mysql. If you choose mysql you would have to enter the database credentials down below."
+                + "You have three valid storage methods, yaml, mysql or sqlite. If you choose mysql you would have to enter the database credentials down below."
                 + "\n"
                 + "All messages below are configurable, I hope you use them because it took 1 hour to make all of them into the plugin and configurable."
                 + "\n"
@@ -56,9 +56,11 @@ public class MainConfiguration {
         config.addDefault("mysql.username", "root");
         config.addDefault("mysql.password", "password");
 
+        config.addDefault("sqlite.file", "database.sqlite");
+
         config.addDefault("cheque.material", Material.PAPER.toString());
         config.addDefault("cheque.name", "&aBank Note");
-        config.addDefault("cheque.lore", Arrays.asList("&7Worth: {amount} {currency}.", "&7&oWritten by {player}"));
+        config.addDefault("cheque.lore", Arrays.asList("&7Worth: {value}.", "&7&oWritten by {player}"));
         config.addDefault("cheque.console_name", "Console");
 
         config.addDefault("Messages.prefix", "&2&lGemsEconomy> ");
@@ -116,13 +118,13 @@ public class MainConfiguration {
         config.addDefault("Messages.usage.set_command", "&2&l>> &a/geco set <user> <amount> [currency] &8- &7Set a players amount of a currency.");
 
         config.addDefault("Messages.help.cheque_command", Arrays.asList("{prefix}&e&lCheque Help",
-                "&2&l>> &a/cheque write <amount> &8- &7Write a cheque with a specified amount.",
-                "&2&l>> &a/cheque redeem &8- &7&oRedeem the cheque."));
+                "&2&l>> &a/cheque write <amount> [currency] &8- &7Write a cheque with a specified amount and currency.",
+                "&2&l>> &a/cheque redeem &8- &7Redeem the cheque."));
 
         config.addDefault("Messages.help.currency_command", Arrays.asList("{prefix}&e&lCurrency Help",
                 "&2&l>> &a/gcurr create <singular> <plural> &8- &7Create a currency.",
                 "&2&l>> &a/gcurr delete <plural> &8- &7Delete a currency.",
-                "&2&l>> &a/gcurr convert &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!",
+                "&2&l>> &a/gcurr convert <method> &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!",
                 "&2&l>> &a/gcurr view <plural> &8- &7View information about a currency.",
                 "&2&l>> &a/gcurr list &8- &7List of currencies.",
                 "&2&l>> &a/gcurr symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.",
@@ -136,7 +138,7 @@ public class MainConfiguration {
 
         config.addDefault("Messages.usage.currency_create", "&2&l>> &a/gcurr create <singular> <plural> &8- &7Create a currency.");
         config.addDefault("Messages.usage.currency_delete", "&2&l>> &a/gcurr delete <plural> &8- &7Delete a currency.");
-        config.addDefault("Messages.usage.currency_convert", "&2&l>> &a/gcurr convert &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!");
+        config.addDefault("Messages.usage.currency_convert", "&2&l>> &a/gcurr convert <method> &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!");
         config.addDefault("Messages.usage.currency_view", "&2&l>> &a/gcurr view <plural> &8- &7View information about a currency.");
         config.addDefault("Messages.usage.currency_list", "&2&l>> &a/gcurr list &8- &7List of currencies.");
         config.addDefault("Messages.usage.currency_symbol", "&2&l>> &a/gcurr symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.");

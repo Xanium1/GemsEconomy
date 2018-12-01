@@ -1,6 +1,6 @@
 name: GemsEconomy
 main: me.xanium.gemseconomy.GemsEconomy
-version: 4.4.2
+version: 4.5
 author: Xanium
 description: An economy plugin made for minecraft servers!
 website: https://www.spigotmc.org/resources/gemseconomy.19655/
@@ -28,7 +28,7 @@ commands:
     usage: /cheque
     description: Write or Redeem a cheque.
     aliases: [note, banknote]
-##  gexchange:
+ # gexchange:
  #   usage: /gexchange
- ##   description: Exchange currencies.
-  #  aliases: [gex, gemsexchange]
+ #   description: Exchange currencies.
+ #   aliases: [gex, gemsexchange]

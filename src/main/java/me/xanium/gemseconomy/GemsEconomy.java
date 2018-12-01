@@ -11,8 +11,10 @@ package me.xanium.gemseconomy;
 import me.xanium.gemseconomy.commands.*;
 import me.xanium.gemseconomy.data.DataStore;
 import me.xanium.gemseconomy.data.MySQLStorage;
+import me.xanium.gemseconomy.data.SQLiteDataStore;
 import me.xanium.gemseconomy.data.YamlStorage;
-import me.xanium.gemseconomy.economy.Cheque;
+import me.xanium.gemseconomy.economy.AccountManager;
+import me.xanium.gemseconomy.economy.ChequeManager;
 import me.xanium.gemseconomy.file.MainConfiguration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
 import me.xanium.gemseconomy.logging.EconomyLogger;
@@ -31,6 +33,7 @@ public class GemsEconomy extends JavaPlugin {
 
     private static DataStore dataStore = null;
     private static GemsEconomy instance;
+    private ChequeManager chequeManager;
     private VaultHandler vaultHandler;
     private NMSVersion nmsVersion;
     private Metrics metrics;
@@ -43,10 +46,17 @@ public class GemsEconomy extends JavaPlugin {
     /**
      * Todo Liste:
      * The exchange commands and maths
-     *
+     * Infinite money using cheques. When stacked they don't get removed. But if they are not both will be consumed and you get money for only 1.
      */
 
-    //BUG: Not transferring balances while converting.
+    /*
+
+    default curr er basert på 1 fordi at da kan man ha valuta verdt mindre og mer
+
+
+
+
+     */
 
     @Override
     public void onLoad(){
@@ -63,11 +73,10 @@ public class GemsEconomy extends JavaPlugin {
         instance = this;
 
         nmsVersion = new NMSVersion();
+        chequeManager = new ChequeManager(this);
         metrics = new Metrics(this);
 
         initializeDataStore(getConfig().getString("storage"), true);
-
-        Cheque.setChequeBase();
 
         getServer().getPluginManager().registerEvents(new EconomyListener(), this);
         getServer().getPluginManager().registerEvents(new MigrationListener(), this);
@@ -77,7 +86,7 @@ public class GemsEconomy extends JavaPlugin {
         getCommand("gpay").setExecutor(new PayCommand());
         getCommand("gcurrencies").setExecutor(new CurrencyCommand());
         getCommand("cheque").setExecutor(new ChequeCommand());
-        //getCommand("gexchange").setExecutor(new ExchangeCommand());
+     //   getCommand("gexchange").setExecutor(new ExchangeCommand());
 
         if(isVault()){
             vaultHandler = new VaultHandler(this);
@@ -103,36 +112,34 @@ public class GemsEconomy extends JavaPlugin {
 
     public void initializeDataStore(String strategy, boolean load) {
 
-        if (strategy.equalsIgnoreCase("yaml")) {
-            dataStore = new YamlStorage("YAML", false, new File(getDataFolder(), "data.yml"));
-            UtilServer.consoleLog("YAML Storage selected.");
-        }
-        else if (strategy.equalsIgnoreCase("mysql")) {
-            String host = getConfig().getString("mysql.host");
-            int port = getConfig().getInt("mysql.port");
-            String user = getConfig().getString("mysql.username");
-            String pass = getConfig().getString("mysql.password");
-            String prefix = getConfig().getString("mysql.tableprefix");
-            String db = getConfig().getString("mysql.database");
-            dataStore = new MySQLStorage("MySQL", true, host, port, user, pass, db, prefix);
-            UtilServer.consoleLog("MySQL Storage selected.");
-        }
-        else {
-            UtilServer.consoleLog("You have not specified the correct data storing method. Check your config.yml!");
+        DataStore.getMethods().add(new YamlStorage(new File(getDataFolder(), "data.yml")));
+        DataStore.getMethods().add(new MySQLStorage(getConfig().getString("mysql.host"), getConfig().getInt("mysql.port"), getConfig().getString("mysql.database"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password")));
+        DataStore.getMethods().add(new SQLiteDataStore(new File(getDataFolder(), getConfig().getString("sqlite.file"))));
+
+        if(strategy != null){
+            dataStore = DataStore.getMethod(strategy);
+        }else{
+            UtilServer.consoleLog("§cNo valid storage method provided.");
+            UtilServer.consoleLog("§cCheck your files, then try again.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        getDataStore().initialize();
+        try {
+            UtilServer.consoleLog("Initializing data store \"" + getDataStore().getName() + "\"...");
+            getDataStore().initialize();
 
-        if (dataStore instanceof MySQLStorage) {
-            if (((MySQLStorage) dataStore).getConnection() == null) {
-                UtilServer.consoleLog("MySQL Database login credentials are wrong. Please check them.");
-                getServer().getPluginManager().disablePlugin(this);
-                return;
+            if(load) {
+                UtilServer.consoleLog("Loading currencies...");
+                getDataStore().loadCurrencies();
+                UtilServer.consoleLog("Loaded " + AccountManager.getCurrencies().size() + " currencies!");
             }
+        } catch (Throwable e) {
+            UtilServer.consoleLog("§cCannot load initial data from DataStore.");
+            UtilServer.consoleLog("§cCheck your files, then try again.");
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
         }
-        if(load)getDataStore().loadCurrencies();
     }
 
     private void checkForUpdate() {
@@ -155,6 +162,10 @@ public class GemsEconomy extends JavaPlugin {
 
     public static void doAsync(Runnable runnable){
         getInstance().getServer().getScheduler().runTaskAsynchronously(getInstance(), runnable);
+    }
+
+    public static void doSync(Runnable runnable){
+        getInstance().getServer().getScheduler().runTask(getInstance(), runnable);
     }
 
     public static DataStore getDataStore() {
@@ -199,5 +210,9 @@ public class GemsEconomy extends JavaPlugin {
 
     public Metrics getMetrics() {
         return metrics;
+    }
+
+    public ChequeManager getChequeManager() {
+        return chequeManager;
     }
 }

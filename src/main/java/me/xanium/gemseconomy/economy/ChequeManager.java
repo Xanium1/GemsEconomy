@@ -18,14 +18,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cheque {
+public class ChequeManager {
 
-    private static final GemsEconomy plugin = GemsEconomy.getInstance();
-    private static ItemStack chequeBaseItem;
-    private static String nbt_value = "value";
-    private static String nbt_currency = "currency";
+    private final GemsEconomy plugin;
+    private final ItemStack chequeBaseItem;
+    private String nbt_value = "value";
+    private String nbt_currency = "currency";
 
-    public static void setChequeBase(){
+    public ChequeManager(GemsEconomy plugin) {
+        this.plugin = plugin;
+
         ItemStack item = new ItemStack(Material.valueOf(plugin.getConfig().getString("cheque.material")), 1);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(UtilString.colorize(plugin.getConfig().getString("cheque.name")));
@@ -34,14 +36,14 @@ public class Cheque {
         chequeBaseItem = item;
     }
 
-    public ItemStack writeCheque(String creatorName, Currency currency, double amount) {
+    public ItemStack write(String creatorName, Currency currency, double amount) {
         if (creatorName.equals("CONSOLE")) {
             creatorName = UtilString.colorize(plugin.getConfig().getString("cheque.console_name"));
         }
         List<String> formatLore = new ArrayList<>();
 
         for (String baseLore2 : chequeBaseItem.getItemMeta().getLore()) {
-            formatLore.add(baseLore2.replace("{amount}", String.valueOf(amount)).replace("{currency}", currency.getPlural()).replace("{player}", creatorName));
+            formatLore.add(baseLore2.replace("{value}", currency.format(amount)).replace("{player}", creatorName));
         }
         ItemStack ret = chequeBaseItem.clone();
         NBTItem nbt = new NBTItem(ret);
@@ -53,10 +55,10 @@ public class Cheque {
         return nbt.getItem();
     }
 
-    public static boolean isAValidCheque(NBTItem itemstack) {
+    public boolean isValid(NBTItem itemstack) {
         if (itemstack.getItem().getType() == chequeBaseItem.getType() && itemstack.getString(nbt_value) != null && itemstack.getString(nbt_currency) != null && itemstack.getItem().getItemMeta().hasLore()) {
             String display = chequeBaseItem.getItemMeta().getDisplayName();
-            if(itemstack.getItem().getItemMeta().getDisplayName().equals(display) && itemstack.getItem().getItemMeta().hasLore()){
+            if (itemstack.getItem().getItemMeta().getDisplayName().equals(display) && itemstack.getItem().getItemMeta().hasLore()) {
                 return (itemstack.getItem().getItemMeta().getDisplayName().equals(display) && itemstack.getItem().getItemMeta().getLore().size() == chequeBaseItem.getItemMeta().getLore().size());
             }
             return false;
@@ -64,14 +66,19 @@ public class Cheque {
         return false;
     }
 
-    public static double getChequeValue(NBTItem itemstack) {
+    public double getValue(NBTItem itemstack) {
         if (itemstack.getString(nbt_currency) != null && itemstack.getString(nbt_value) != null) {
             return Double.parseDouble(itemstack.getString(nbt_value));
         }
         return 0;
     }
 
-    public static Currency getChequeCurrency(NBTItem item){
+    /**
+     *
+     * @param item - The Cheque.
+     * @return - Currency it represents.
+     */
+    public Currency getCurrency(NBTItem item) {
         if (item.getString(nbt_currency) != null && item.getString(nbt_value) != null) {
             return AccountManager.getCurrency(item.getString(nbt_currency));
         }

@@ -31,7 +31,7 @@ public class VaultHandler {
             }
 
             ServicesManager sm = Bukkit.getServicesManager();
-            sm.register(Economy.class, this.economy, plugin, ServicePriority.High);
+            sm.register(Economy.class, this.economy, plugin, ServicePriority.Highest);
         } catch (Exception e) {
             if(plugin.isDebug()) {
                 e.printStackTrace();

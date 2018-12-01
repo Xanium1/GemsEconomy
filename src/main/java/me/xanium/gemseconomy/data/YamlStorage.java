@@ -28,8 +28,8 @@ public class YamlStorage extends DataStore {
     private YamlConfiguration configuration;
     private File file;
 
-    public YamlStorage(String name, boolean topSupported, File file) {
-        super(name, topSupported);
+    public YamlStorage(File file) {
+        super("YAML", false);
         this.file = file;
     }
 
@@ -71,7 +71,7 @@ public class YamlStorage extends DataStore {
                 currency.setDefaultCurrency(getConfig().getBoolean(path + ".defaultcurrency"));
                 currency.setPayable(getConfig().getBoolean(path + ".payable"));
                 currency.setSymbol(getConfig().getString(path + ".symbol"));
-               // currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
+            //    currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
                 AccountManager.getCurrencies().add(currency);
                 UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }
@@ -89,7 +89,7 @@ public class YamlStorage extends DataStore {
         getConfig().set(path + ".defaultcurrency", currency.isDefaultCurrency());
         getConfig().set(path + ".payable", currency.isPayable());
         getConfig().set(path + ".color", currency.getColor().name());
-        getConfig().set(path + ".exchange_rate", currency.getExchangeRate());
+        getConfig().set(path + ".exchange_rate", 0);
         try {
             getConfig().save(getFile());
         } catch (IOException e) {

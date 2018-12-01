@@ -21,6 +21,7 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.data.DataStore;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
@@ -32,6 +33,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -61,6 +63,7 @@ public class CurrencyCommand implements CommandExecutor {
                             if (AccountManager.getCurrencies().size() == 1) {
                                 currency.setDefaultCurrency(true);
                             }
+                            currency.setExchangeRate(1.0);
                             GemsEconomy.getDataStore().saveCurrency(currency);
                         } else {
                             sender.sendMessage(F.getPrefix() + "§cCurrency already exists.");
@@ -84,7 +87,7 @@ public class CurrencyCommand implements CommandExecutor {
                             sender.sendMessage(F.getPrefix() + "§7Default: " + (currency.isDefaultCurrency() ? "§aYes" : "§cNo"));
                             sender.sendMessage(F.getPrefix() + "§7Payable: " + (currency.isPayable() ? "§aYes" : "§cNo"));
                             sender.sendMessage(F.getPrefix() + "§7Color: " + currency.getColor() + currency.getColor().name());
-                            //sender.sendMessage(F.getPrefix() + "§7Rate: " + currency.getColor() + currency.getExchangeRate());
+                            sender.sendMessage(F.getPrefix() + "§7Rate: " + currency.getColor() + currency.getExchangeRate());
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
                         }
@@ -249,133 +252,134 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("setrate")) {
                     if (args.length == 3) {
-                        sender.sendMessage(F.getPrefix() + "§cUnder development.");
+                        sender.sendMessage("§cUnder dev");
 
-                            /*Currency currency = AccountManager.getCurrency(args[1]);
-                            if(currency != null){
-                                double amount;
-                                if (currency.isDecimalSupported()) {
-                                    try {
-                                        amount = Double.parseDouble(args[2]);
-                                        if (amount <= 0.0) {
-                                            throw new NumberFormatException();
-                                        }
-                                    } catch (NumberFormatException ex) {
-                                        sender.sendMessage(F.getUnvalidAmount());
-                                        return;
+                        /*Currency currency = AccountManager.getCurrency(args[1]);
+                        if (currency != null) {
+                            if(currency.isDefaultCurrency()){
+                                sender.sendMessage(F.getPrefix() + "The default currency exchange rate can't be edited.");
+                                return;
+                            }
+                            double amount;
+                            if (currency.isDecimalSupported()) {
+                                try {
+                                    amount = Double.parseDouble(args[2]);
+                                    if (amount <= 0.0) {
+                                        throw new NumberFormatException();
                                     }
-                                }else {
-                                    try {
-                                        amount = Integer.parseInt(args[2]);
-                                        if (amount <= 0.0) {
-                                            throw new NumberFormatException();
-                                        }
-                                    } catch (NumberFormatException ex) {
-                                        sender.sendMessage(F.getUnvalidAmount());
-                                        return;
-                                    }
+                                } catch (NumberFormatException ex) {
+                                    sender.sendMessage(F.getUnvalidAmount());
+                                    return;
                                 }
+                            } else {
+                                sender.sendMessage(F.getPrefix() + "The currency must have decimals!");
+                                return;
+                            }
 
-                                currency.setExchangeRate(amount);
-                                GemsEconomy.getDataStore().saveCurrency(currency);
-                                sender.sendMessage(F.getExchangeRateSet().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()).replace("{amount}", String.valueOf(amount)));
-                            }else{
-                                sender.sendMessage(F.getUnknownCurrency());
-                            }*/
+                            currency.setExchangeRate(amount);
+                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            sender.sendMessage(F.getExchangeRateSet().replace("{currencycolor}", "" + currency.getColor()).replace("{currency}", currency.getPlural()).replace("{amount}", String.valueOf(amount)));
+                        } else {
+                            sender.sendMessage(F.getUnknownCurrency());
+                        }*/
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Rate());
                     }
                 } else if (cmd.equalsIgnoreCase("convert")) {
-                    sender.sendMessage(F.getPrefix() + "§aLoading data..");
+                    if (args.length == 2) {
+                        String method = args[1];
 
-                    ArrayList<Currency> currencies = new ArrayList<>(AccountManager.getCurrencies());
-                    sender.sendMessage(F.getPrefix() + "§aStored currencies.");
-                    ArrayList<Account> offline = new ArrayList<>(GemsEconomy.getDataStore().getOfflineAccounts());
-                    sender.sendMessage(F.getPrefix() + "§aStored accounts.");
 
-                    boolean mysql;
-                    String runningDataStore = GemsEconomy.getDataStore().getName();
-                    if (runningDataStore.equalsIgnoreCase("YAML")) {
-                        mysql = true;
-                        plugin.getConfig().set("storage", "mysql");
-                    } else {
-                        mysql = false;
-                        plugin.getConfig().set("storage", "yaml");
+                        sender.sendMessage(F.getPrefix() + "§aLoading data..");
+
+                        ArrayList<Currency> currencies = new ArrayList<>(AccountManager.getCurrencies());
+                        sender.sendMessage(F.getPrefix() + "§aStored currencies.");
+                        ArrayList<Account> offline = new ArrayList<>(GemsEconomy.getDataStore().getOfflineAccounts());
+                        sender.sendMessage(F.getPrefix() + "§aStored accounts.");
+
+                        DataStore ds = DataStore.getMethod(method);
+                        if (ds != null) {
+                            DataStore current = GemsEconomy.getDataStore();
+                            if (ds.getName().equalsIgnoreCase(current.getName())) {
+                                sender.sendMessage(F.getPrefix() + "You can't convert to the same datastore.");
+                                return;
+                            }
+                            plugin.getConfig().set("storage", ds.getName());
+                            plugin.saveConfig();
+
+                            AccountManager.getAccounts().clear();
+                            AccountManager.getCurrencies().clear();
+
+                            sender.sendMessage(F.getPrefix() + "§aSwitching from §f" + current.getName() + " §ato §f" + ds.getName() + "§a.");
+
+                            if (ds.getName().equalsIgnoreCase("yaml")) {
+                                GemsEconomy.doSync(() -> {
+                                    File data = new File(GemsEconomy.getInstance().getDataFolder() + File.separator + "data.yml");
+                                    if (data.exists()) {
+                                        data.delete();
+                                    }
+                                });
+                            }
+
+                            if (GemsEconomy.getDataStore() != null) {
+                                GemsEconomy.getDataStore().close();
+
+                                sender.sendMessage(F.getPrefix() + "§aDataStore is closed. Plugin is essentially dead now.");
+                            }
+
+                            plugin.initializeDataStore(ds.getName(), false);
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+
+                            sender.sendMessage(F.getPrefix() + "§aInitialized " + ds.getName() + " Data Store. Check console for wrong username/password if using mysql.");
+
+
+                            if (GemsEconomy.getDataStore().getName() != null) {
+                                for (Currency c : currencies) {
+                                    Currency newCurrency = new Currency(c.getUuid(), c.getSingular(), c.getPlural());
+                                    newCurrency.setExchangeRate(c.getExchangeRate());
+                                    newCurrency.setDefaultCurrency(c.isDefaultCurrency());
+                                    newCurrency.setSymbol(c.getSymbol());
+                                    newCurrency.setColor(c.getColor());
+                                    newCurrency.setDecimalSupported(c.isDecimalSupported());
+                                    newCurrency.setPayable(c.isPayable());
+                                    newCurrency.setDefaultBalance(c.getDefaultBalance());
+                                    GemsEconomy.getDataStore().saveCurrency(newCurrency);
+                                }
+                                sender.sendMessage(F.getPrefix() + "§aSaved currencies to storage.");
+                                GemsEconomy.getDataStore().loadCurrencies();
+                                sender.sendMessage(F.getPrefix() + "§aLoaded all currencies as usual.");
+
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException ex) {
+                                    ex.printStackTrace();
+                                }
+
+                                for (Account a : offline) {
+                                    GemsEconomy.getDataStore().saveAccount(a);
+                                }
+                                sender.sendMessage(F.getPrefix() + "§aAll accounts saved to storage.");
+
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException ex) {
+                                    ex.printStackTrace();
+                                }
+
+                                for (Player players : Bukkit.getOnlinePlayers()) {
+                                    GemsEconomy.getDataStore().loadAccount(players.getUniqueId());
+                                }
+                                sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
+                            }
+                            sender.sendMessage(F.getPrefix() + "§aData storage conversion is done.");
+                        } else {
+                            sender.sendMessage(F.getPrefix() + "Data Storing method not found.");
+                        }
                     }
-                    plugin.saveConfig();
-
-                    AccountManager.getAccounts().clear();
-                    AccountManager.getCurrencies().clear();
-
-                    sender.sendMessage(F.getPrefix() + "§aSwitching from §f" + (mysql ? "yaml" : "mysql") + " §ato §f" + (mysql ? "mysql" : "yaml") + "§a.");
-
-                    if (GemsEconomy.getDataStore() != null) {
-                        GemsEconomy.getDataStore().close();
-
-                        sender.sendMessage(F.getPrefix() + "§aDataStore is closed. Plugin is essentially dead now.");
-                    }
-
-                    if (mysql) {
-                        plugin.initializeDataStore("mysql", false);
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-
-                        sender.sendMessage(F.getPrefix() + "§aInitialized MySQL Data store. Check console for wrong username/password.");
-                    } else {
-                        plugin.initializeDataStore("yaml", false);
-                        sender.sendMessage(F.getPrefix() + "§aInitialzed Yaml Data store.");
-                    }
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-
-                    if (GemsEconomy.getDataStore().getName() != null) {
-                        for (Currency c : currencies) {
-                            Currency newCurrency = new Currency(c.getUuid(), c.getSingular(), c.getPlural());
-                            newCurrency.setExchangeRate(c.getExchangeRate());
-                            newCurrency.setDefaultCurrency(c.isDefaultCurrency());
-                            newCurrency.setSymbol(c.getSymbol());
-                            newCurrency.setColor(c.getColor());
-                            newCurrency.setDecimalSupported(c.isDecimalSupported());
-                            newCurrency.setPayable(c.isPayable());
-                            newCurrency.setDefaultBalance(c.getDefaultBalance());
-                            GemsEconomy.getDataStore().saveCurrency(newCurrency);
-                        }
-                        sender.sendMessage(F.getPrefix() + "§aSaved currencies to storage.");
-                        GemsEconomy.getDataStore().loadCurrencies();
-                        sender.sendMessage(F.getPrefix() + "§aLoaded all currencies as usual.");
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-
-                        for (Account a : offline) {
-                            GemsEconomy.getDataStore().saveAccount(a);
-                        }
-                        sender.sendMessage(F.getPrefix() + "§aAll accounts saved to storage.");
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-
-                        for (Player players : Bukkit.getOnlinePlayers()) {
-                            GemsEconomy.getDataStore().loadAccount(players.getUniqueId());
-                        }
-                        sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
-                    }
-
-                    sender.sendMessage(F.getPrefix() + "§aData storage conversion is done.");
-
                 } else {
                     sender.sendMessage(F.getPrefix() + "§cUnknown currency sub-command.");
                 }
