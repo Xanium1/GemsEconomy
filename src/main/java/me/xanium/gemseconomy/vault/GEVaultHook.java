@@ -13,13 +13,12 @@ import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
 import net.milkbowl.vault.economy.AbstractEconomy;
 import net.milkbowl.vault.economy.EconomyResponse;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GemsEco extends AbstractEconomy {
+public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public boolean isEnabled() {
@@ -28,7 +27,7 @@ public class GemsEco extends AbstractEconomy {
 
     @Override
     public String getName() {
-        return "GemsEco";
+        return "GemsEconomy";
     }
 
     @Override
@@ -93,7 +92,9 @@ public class GemsEco extends AbstractEconomy {
 
     @Override
     public double getBalance(OfflinePlayer player) {
-        return getBalance(player.getName());
+        Account user = AccountManager.getAccount(player.getUniqueId());
+        Currency currency = AccountManager.getDefaultCurrency();
+        return user.getBalance(currency);
     }
 
     @Override
@@ -142,25 +143,50 @@ public class GemsEco extends AbstractEconomy {
         return new EconomyResponse(amount, balance, type, error);
     }
 
-
     @Override
-    public List<String> getBanks() {
-        return new ArrayList<>();
+    public EconomyResponse withdrawPlayer(String player, double amount) {
+        if (amount < 0) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
+        }
+
+        double balance;
+        EconomyResponse.ResponseType type = EconomyResponse.ResponseType.FAILURE;
+        String error = null;
+
+        Account user = AccountManager.getAccount(player);
+        Currency currency = AccountManager.getDefaultCurrency();
+
+        if(user.withdraw(currency, amount)){
+            balance = user.getBalance(currency);
+            type = EconomyResponse.ResponseType.SUCCESS;
+        }else{
+            balance = user.getBalance(currency);
+            error = "Could not withdraw " + amount + " to " + player + " because something went wrong.";
+        }
+        return new EconomyResponse(amount, balance, type, error);
     }
 
     @Override
-    public boolean hasBankSupport() {
-        return false;
-    }
+    public EconomyResponse depositPlayer(String player, double amount) {
+        if (amount < 0) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
+        }
 
-    @Override
-    public int fractionalDigits() {
-        return -1;
-    }
+        double balance;
+        EconomyResponse.ResponseType type = EconomyResponse.ResponseType.FAILURE;
+        String error = null;
 
-    @Override
-    public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        return withdrawPlayer(Bukkit.getOfflinePlayer(playerName), amount);
+        Account user = AccountManager.getAccount(player);
+        Currency currency = AccountManager.getDefaultCurrency();
+
+        if(user.deposit(currency, amount)){
+            balance = user.getBalance(currency);
+            type = EconomyResponse.ResponseType.SUCCESS;
+        }else{
+            balance = user.getBalance(currency);
+            error = "Could not deposit " + amount + " to " + player + " because something went wrong.";
+        }
+        return new EconomyResponse(amount, balance, type, error);
     }
 
     @Override
@@ -171,11 +197,6 @@ public class GemsEco extends AbstractEconomy {
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
         return depositPlayer(playerName, amount);
-    }
-
-    @Override
-    public EconomyResponse depositPlayer(String playerName, double amount) {
-        return depositPlayer(Bukkit.getOfflinePlayer(playerName), amount);
     }
 
     @Override
@@ -230,42 +251,57 @@ public class GemsEco extends AbstractEconomy {
 
     @Override
     public EconomyResponse createBank(String name, String player) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse deleteBank(String name) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse bankHas(String name, double amount) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse bankWithdraw(String name, double amount) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse bankDeposit(String name, double amount) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse isBankMember(String name, String playerName) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
     }
 
     @Override
     public EconomyResponse bankBalance(String name) {
-        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEco does not support bank accounts!");
+        return new EconomyResponse(0, 0, EconomyResponse.ResponseType.NOT_IMPLEMENTED, "GemsEconomy does not support bank accounts!");
+    }
+
+    @Override
+    public List<String> getBanks() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean hasBankSupport() {
+        return false;
+    }
+
+    @Override
+    public int fractionalDigits() {
+        return -1;
     }
 
 }

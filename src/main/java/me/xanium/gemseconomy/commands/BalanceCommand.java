@@ -9,10 +9,10 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -52,7 +52,7 @@ public class BalanceCommand implements CommandExecutor {
                     sender.sendMessage(F.getBalanceMultiple().replace("{player}", account.getDisplayName()));
                     for (Currency currency : AccountManager.getCurrencies()) {
                         double balance = account.getBalance(currency);
-                        sender.sendMessage("§a§l>> " + currency.getColor() + currency.format(balance));
+                        sender.sendMessage(F.getBalanceList().replace("{currencycolor}", currency.getColor()+"").replace("{format}", currency.format(balance)));
                     }
                 }
             } else {

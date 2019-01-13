@@ -17,8 +17,9 @@ import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.ChequeManager;
 import me.xanium.gemseconomy.file.MainConfiguration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
+import me.xanium.gemseconomy.logging.EcoLogger;
 import me.xanium.gemseconomy.logging.EconomyLogger;
-import me.xanium.gemseconomy.migration.MigrationListener;
+import me.xanium.gemseconomy.logging.ILogger;
 import me.xanium.gemseconomy.nbt.NMSVersion;
 import me.xanium.gemseconomy.utils.Metrics;
 import me.xanium.gemseconomy.utils.Updater;
@@ -37,25 +38,33 @@ public class GemsEconomy extends JavaPlugin {
     private VaultHandler vaultHandler;
     private NMSVersion nmsVersion;
     private Metrics metrics;
+    private ILogger economyLogger;
 
     private boolean debug = false;
     private boolean vault = false;
-    private boolean logging = true;
+    private boolean logging = false;
+
+    private boolean disabling = false;
 
 
     /**
      * Todo Liste:
-     * The exchange commands and maths
-     * Infinite money using cheques. When stacked they don't get removed. But if they are not both will be consumed and you get money for only 1.
+     *
+     *
      */
 
-    /*
-
-    default curr er basert på 1 fordi at da kan man ha valuta verdt mindre og mer
 
 
-
-
+    /**
+    Whats been done:
+     - Removed migration system from version 3.2.1
+     - Found unnecessary data saving, removed it, should be some what faster now.
+     - Commands have been renamed, still works with the old names as aliases.
+     - Fixed bugs regarding data storing conversions.
+     - MySQL Data store backend is now HikariCP. (A lot better performance)
+     - New logging system. A lot more understandable log files.
+     - New Exchange and Conversion between currency rates system. Sorry for this being delayed so many times.
+     - You can now use underscores (___) in currency singular and plural to make the plugin format the name as this: US Dollar (When you actually typed: US_Dollar)
      */
 
     @Override
@@ -74,19 +83,19 @@ public class GemsEconomy extends JavaPlugin {
 
         nmsVersion = new NMSVersion();
         chequeManager = new ChequeManager(this);
+        economyLogger = new EcoLogger(this);
         metrics = new Metrics(this);
 
         initializeDataStore(getConfig().getString("storage"), true);
 
         getServer().getPluginManager().registerEvents(new EconomyListener(), this);
-        getServer().getPluginManager().registerEvents(new MigrationListener(), this);
-        getCommand("gbalance").setExecutor(new BalanceCommand());
-        getCommand("gbaltop").setExecutor(new BalanceTopCommand());
-        getCommand("geco").setExecutor(new EconomyCommand());
-        getCommand("gpay").setExecutor(new PayCommand());
-        getCommand("gcurrencies").setExecutor(new CurrencyCommand());
+        getCommand("balance").setExecutor(new BalanceCommand());
+        getCommand("baltop").setExecutor(new BalanceTopCommand());
+        getCommand("economy").setExecutor(new EconomyCommand());
+        getCommand("pay").setExecutor(new PayCommand());
+        getCommand("currency").setExecutor(new CurrencyCommand());
         getCommand("cheque").setExecutor(new ChequeCommand());
-     //   getCommand("gexchange").setExecutor(new ExchangeCommand());
+        getCommand("exchange").setExecutor(new ExchangeCommand());
 
         if(isVault()){
             vaultHandler = new VaultHandler(this);
@@ -96,11 +105,16 @@ public class GemsEconomy extends JavaPlugin {
             UtilServer.consoleLog("Vault compatibility is disabled.");
         }
 
+        if(isLogging()) {
+            getEconomyLogger().save();
+        }
+
         doAsync(() -> checkForUpdate());
     }
 
     @Override
     public void onDisable() {
+        disabling = true;
 
         if(isVault()) getVaultHandler().unhook();
         if(isLogging()) EconomyLogger.closeLog();
@@ -146,11 +160,11 @@ public class GemsEconomy extends JavaPlugin {
         Updater updater = new Updater(this);
         try {
             if (updater.checkForUpdates()) {
-                UtilServer.consoleLog("--------------------------------");
+                UtilServer.consoleLog("-------------------------------------------");
                 UtilServer.consoleLog("New Version: " + updater.getNewVersion());
                 UtilServer.consoleLog("Current Version: " + updater.getCurrentVersion());
                 UtilServer.consoleLog("Download link: " + updater.getResourceURL());
-                UtilServer.consoleLog("--------------------------------");
+                UtilServer.consoleLog("--------------------------------------------");
             }
         } catch (IOException e) {
             UtilServer.consoleLog("Could not check for updates! Error log will follow if debug is enabled.");
@@ -204,6 +218,10 @@ public class GemsEconomy extends JavaPlugin {
         return vaultHandler;
     }
 
+    public ILogger getEconomyLogger() {
+        return economyLogger;
+    }
+
     public NMSVersion getNmsVersion() {
         return nmsVersion;
     }
@@ -214,5 +232,9 @@ public class GemsEconomy extends JavaPlugin {
 
     public ChequeManager getChequeManager() {
         return chequeManager;
+    }
+
+    public boolean isDisabling() {
+        return disabling;
     }
 }

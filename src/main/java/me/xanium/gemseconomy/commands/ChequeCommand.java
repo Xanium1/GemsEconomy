@@ -84,7 +84,7 @@ public class ChequeCommand implements CommandExecutor {
                     player.sendMessage(F.getChequeInvalid());
                 }
             } else {
-                player.sendMessage(F.getPrefix() + "Unknown cheque sub-command.");
+                player.sendMessage(F.getUnknownSubCommand());
             }
         }
 
@@ -131,7 +131,7 @@ public class ChequeCommand implements CommandExecutor {
                     player.sendMessage(F.getUnvalidAmount());
                 }
             } else {
-                player.sendMessage(F.getPrefix() + "Unknown cheque sub-command.");
+                player.sendMessage(F.getUnknownSubCommand());
             }
         }
         return true;

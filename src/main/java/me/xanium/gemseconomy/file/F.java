@@ -85,6 +85,10 @@ public class F {
 
     public static String getUnknownCurrency() { return getPrefix() + colorize(cfg.getString("Messages.unknownCurrency")); }
 
+    public static String getUnknownSubCommand() {
+        return getPrefix() + colorize(cfg.getString("unknownCommand"));
+    }
+
     public static void getManageHelp(CommandSender sender) {
         for (String s : cfg.getStringList("Messages.help.eco_command")) {
             sender.sendMessage(colorize(s.replace("{prefix}", getPrefix())));
@@ -101,6 +105,9 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.balance.current"));
     }
     public static String getBalanceMultiple() { return getPrefix() + colorize(cfg.getString("Messages.balance.multiple")); }
+    public static String getBalanceList() {
+        return colorize(cfg.getString("Messages.balance.list"));
+    }
 
     public static String getUnvalidAmount() {
         return getPrefix() + colorize(cfg.getString("Messages.invalidamount"));
@@ -203,6 +210,10 @@ public class F {
 
     public static String getExchangeSuccess(){
         return getPrefix() + colorize(cfg.getString("Messages.exchange_success"));
+    }
+
+    public static String getExchangeSuccessCustom(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_success_custom"));
     }
 
     public static String getExchangeRateSet(){

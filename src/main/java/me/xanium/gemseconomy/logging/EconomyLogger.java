@@ -58,9 +58,9 @@ public class EconomyLogger {
         } else {
             sb.append(",\"");
             sb.append(location.getWorld().getName()).append("\",");
-            sb.append(location.getBlockX()).append(",");
-            sb.append(location.getBlockY()).append(",");
-            sb.append(location.getBlockZ()).append(",");
+            sb.append(location.getX()).append(",");
+            sb.append(location.getY()).append(",");
+            sb.append(location.getZ()).append(",");
         }
         sb.append("\n");
         try {

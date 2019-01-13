@@ -1,34 +1,39 @@
 name: GemsEconomy
 main: me.xanium.gemseconomy.GemsEconomy
-version: 4.5
+version: 4.6
 author: Xanium
 description: An economy plugin made for minecraft servers!
 website: https://www.spigotmc.org/resources/gemseconomy.19655/
+load: STARTUP
+loadbefore:
+  - ItemFrameShops
+softdepend: [Vault]
 commands:
-  gbalance:
+  balance:
     description: Shows your balances
     usage: /gbalance (account)
-    aliases: [gbal, gmoney]
-  gbaltop:
+    aliases: [gbal, gmoney, bal]
+  baltop:
     description: Shows the top balances of the server
     usage: /baltop (currency) (page)
-    aliases: [gmoneytop, gecotop, gtop]
-  gcurrencies:
+    aliases: [gmoneytop, gecotop, gtop, gbaltop]
+  currency:
     description: Manage the currencies.
     usage: /gcurrencies
-    aliases: [gcurr, gemscurrencies, gcurrency]
-  geco:
+    aliases: [gcurr, gemscurrencies, gcurrency, currencies]
+  economy:
     description: Give, set or take currency.
-    usage: /geco <set|take|give> <account> <amount> (currency)
-    aliases: [gconomy]
-  gpay:
+    usage: /eco <set|take|give> <account> <amount> (currency)
+    aliases: [geconomy, eco, geco, gemseconomy]
+  pay:
     description: Pays another account
-    usage: /gpay <account> <amount> (currency)
+    usage: /pay <account> <amount> (currency)
+    aliases: [gpay, gemspay]
   cheque:
     usage: /cheque
     description: Write or Redeem a cheque.
     aliases: [note, banknote]
- # gexchange:
- #   usage: /gexchange
- #   description: Exchange currencies.
- #   aliases: [gex, gemsexchange]
+  exchange:
+    usage: /exchange
+    description: Exchange currencies.
+    aliases: [gex, gemsexchange, gexchange]

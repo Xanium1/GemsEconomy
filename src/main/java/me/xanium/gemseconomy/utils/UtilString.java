@@ -13,9 +13,9 @@ import me.xanium.gemseconomy.file.F;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 
 public class UtilString {
 
@@ -34,15 +34,16 @@ public class UtilString {
         return true;
     }
 
-    public static String format(double value) {
-        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-
-        int max = 2;
-        int min = 0;
-
-        nf.setMaximumFractionDigits(max);
-        nf.setMinimumFractionDigits(min);
-        return nf.format(value);
+    public static String format(double money) {
+        DecimalFormat format = new DecimalFormat();
+        DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
+        symbols.setGroupingSeparator(',');
+        symbols.setDecimalSeparator('.');
+        format.setDecimalFormatSymbols(symbols);
+        format.setGroupingUsed(true);
+        format.setGroupingSize(3);
+        double roundOff = Math.round(money * 100.0) / 100.0;
+        return format.format(roundOff);
     }
 
     public static String colorize(String string){

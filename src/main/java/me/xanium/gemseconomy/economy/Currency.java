@@ -69,18 +69,18 @@ public class Currency {
         if (this.isDecimalSupported()) {
             amt.append(UtilString.format(amount));
         } else {
-            String v = String.valueOf(amount);
-            String[] vv = v.split(".");
-            if (vv.length > 0) {
-                v = vv[0];
+            String s = String.valueOf(amount);
+            String[] ss = s.split(".");
+            if (ss.length > 0) {
+                s = ss[0];
             }
-            amt.append(NumberFormat.getInstance().format(Double.parseDouble(v)));
+            amt.append(NumberFormat.getInstance().format(Double.parseDouble(s)));
         }
         amt.append(" ");
         if (amount != 1.0) {
-            amt.append(this.getPlural());
+            amt.append(this.getPlural().replace("_", " "));
         } else {
-            amt.append(this.getSingular());
+            amt.append(this.getSingular().replace("_", " "));
         }
         return amt.toString();
     }

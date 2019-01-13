@@ -8,31 +8,35 @@
 
 package me.xanium.gemseconomy.data;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import me.xanium.gemseconomy.utils.UtilServer;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MySQLStorage extends SQLDataStore {
 
-    private String host;
-    private int port;
-    private String username;
-    private String password;
-    private String database;
+    private HikariConfig hikariConfig;
+    private HikariDataSource hikari;
 
     public MySQLStorage(String host, int port, String database, String username, String password) {
         super("MySQL", true);
-        this.host = host;
-        this.port = port;
-        this.database = database;
-        this.username = username;
-        this.password = password;
+        hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:mysql://"+ host + ":" + port + "/" + database + "?allowPublicKeyRetrieval=true&useSSL=false");
+        hikariConfig.setPassword(password);
+        hikariConfig.setUsername(username);
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
     }
 
     @Override
     protected Connection openConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase() + "?useSSL=false", getUsername(), getPassword());
+        if(hikari == null)hikari = new HikariDataSource(hikariConfig);
+        return hikari.getConnection();
     }
 
     @Override
@@ -51,8 +55,9 @@ public class MySQLStorage extends SQLDataStore {
     @Override
     public void initialize() {
         super.initialize();
-       /* if (this.getConnection() != null) {
+        if (this.getConnection() != null) {
             try {
+                PreparedStatement stmt;
                 List<String> columns = new ArrayList<>();
                 DatabaseMetaData metaData = getConnection().getMetaData();
                 ResultSet tableResultSet = metaData.getTables(null, "public", null, new String[]{"TABLE"});
@@ -76,12 +81,14 @@ public class MySQLStorage extends SQLDataStore {
                 if(!columns.contains("exchange_rate")) {
                     stmt = this.getConnection().prepareStatement("ALTER TABLE " + this.getTablePrefix() + "_currencies ADD exchange_rate DECIMAL NULL DEFAULT NULL AFTER `color`;");
                     stmt.execute();
+
+                    UtilServer.consoleLog("Altered Table gemsconomy_currencies to support the new variable.");
                 }
             }
             catch (SQLException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
     }
 
     @Override
@@ -443,24 +450,4 @@ public class MySQLStorage extends SQLDataStore {
             e.printStackTrace();
         }
     }*/
-
-    private String getHost() {
-        return this.host;
-    }
-
-    private int getPort() {
-        return this.port;
-    }
-
-    private String getUsername() {
-        return this.username;
-    }
-
-    private String getPassword() {
-        return this.password;
-    }
-
-    private String getDatabase() {
-        return this.database;
-    }
 }

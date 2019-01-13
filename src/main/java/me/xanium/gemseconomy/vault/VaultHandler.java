@@ -9,7 +9,6 @@
 package me.xanium.gemseconomy.vault;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.utils.UtilServer;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -17,7 +16,7 @@ import org.bukkit.plugin.ServicesManager;
 
 public class VaultHandler {
 
-    private GemsEco economy = null;
+    private GEVaultHook economy = null;
     private GemsEconomy plugin;
 
     public VaultHandler(GemsEconomy plugin){
@@ -27,17 +26,13 @@ public class VaultHandler {
     public void hook() {
         try {
             if (this.economy == null) {
-                this.economy = new GemsEco();
+                this.economy = new GEVaultHook();
             }
 
             ServicesManager sm = Bukkit.getServicesManager();
             sm.register(Economy.class, this.economy, plugin, ServicePriority.Highest);
         } catch (Exception e) {
-            if(plugin.isDebug()) {
-                e.printStackTrace();
-            }else{
-                UtilServer.consoleLog("An exception were triggered. Enable debug to view stack trace.");
-            }
+            e.printStackTrace();
         }
     }
 

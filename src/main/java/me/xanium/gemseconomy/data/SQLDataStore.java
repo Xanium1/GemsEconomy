@@ -27,7 +27,7 @@ public abstract class SQLDataStore extends DataStore {
     private Connection connection;
     private Map<UUID, CachedTopList> cachedTopList;
 
-    public SQLDataStore(String name, boolean topSupported) {
+    SQLDataStore(String name, boolean topSupported) {
         super(name, topSupported);
         this.cachedTopList = new HashMap<>();
     }
@@ -36,15 +36,15 @@ public abstract class SQLDataStore extends DataStore {
 
     protected abstract void setupTables() throws SQLException;
 
-    protected String getTablePrefix() {
+    String getTablePrefix() {
         return GemsEconomy.getInstance().getConfig().getString("mysql.tableprefix");
     }
 
-    public final Connection getConnection() {
+    final Connection getConnection() {
         return this.connection;
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         if (connection == null) {
             return false;
         }
@@ -165,7 +165,7 @@ public abstract class SQLDataStore extends DataStore {
                 stmt.setInt(4, currency.isDefaultCurrency() ? 1 : 0);
                 stmt.setInt(5, currency.isPayable() ? 1 : 0);
                 stmt.setString(6, currency.getColor().name());
-                stmt.setDouble(7, 0);
+                stmt.setDouble(7, currency.getExchangeRate());
                 stmt.setString(8, currency.getUuid().toString());
                 stmt.execute();
             }
@@ -305,8 +305,7 @@ public abstract class SQLDataStore extends DataStore {
                 PreparedStatement stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_accounts;");
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    Account acc = returnAccountWithBalances(loadAccount(UUID.fromString(rs.getString("uuid"))));
-                    accounts.add(acc);
+                    accounts.add(returnAccountWithBalances(loadAccount(UUID.fromString(rs.getString("uuid")))));
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -352,7 +351,6 @@ public abstract class SQLDataStore extends DataStore {
 
     @Override
     public void saveAccount(Account account) {
-
         checkConnection();
         try {
             PreparedStatement stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_accounts WHERE uuid = ? LIMIT 1");
@@ -373,7 +371,11 @@ public abstract class SQLDataStore extends DataStore {
             }
             rs.close();
             for (Currency currency : AccountManager.getCurrencies()) {
-                double balance = account.getBalance(currency.getSingular());
+                double balance = account.getBalance(currency.getPlural());
+                if(balance == -100){
+                    balance = currency.getDefaultBalance();
+                }
+
                 if (balance != currency.getDefaultBalance()) {
                     stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_balances WHERE account_id = ? AND currency_id = ? LIMIT 1");
                     stmt.setString(1, account.getUuid().toString());
@@ -416,7 +418,4 @@ public abstract class SQLDataStore extends DataStore {
         }
     }
 
-    public Map<UUID, CachedTopList> getCachedTopList() {
-        return cachedTopList;
-    }
 }

@@ -3,6 +3,8 @@
     <output-path>$PROJECT_DIR$/../../TestServer/1.13/plugins</output-path>
     <root id="archive" name="GemsEconomy.jar">
       <element id="module-output" name="GemsEconomy" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/zaxxer/HikariCP/3.1.0/HikariCP-3.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

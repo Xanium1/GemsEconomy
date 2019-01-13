@@ -4,13 +4,10 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
-import me.xanium.gemseconomy.economy.EcoUtil;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import java.math.BigDecimal;
 
 public class ExchangeCommand implements CommandExecutor {
 
@@ -26,13 +23,13 @@ public class ExchangeCommand implements CommandExecutor {
                 F.getExchangeHelp(sender);
             } else if (args.length == 3) {
                 Currency toExchange = AccountManager.getCurrency(args[0]);
-                Currency toReceive = AccountManager.getCurrency(args[1]);
+                Currency toReceive = AccountManager.getCurrency(args[2]);
                 double amount;
 
                 if (toExchange != null && toReceive != null) {
                     if (toReceive.isDecimalSupported()) {
                         try {
-                            amount = Double.parseDouble(args[2]);
+                            amount = Double.parseDouble(args[1]);
                             if (amount <= 0.0) {
                                 throw new NumberFormatException();
                             }
@@ -42,7 +39,7 @@ public class ExchangeCommand implements CommandExecutor {
                         }
                     } else {
                         try {
-                            amount = Integer.parseInt(args[2]);
+                            amount = Integer.parseInt(args[1]);
                             if (amount <= 0.0) {
                                 throw new NumberFormatException();
                             }
@@ -51,21 +48,16 @@ public class ExchangeCommand implements CommandExecutor {
                             return;
                         }
                     }
-
-
                     Account account = AccountManager.getAccount(sender.getName());
                     if (account != null) {
-                        double convert = EcoUtil.convert(toExchange.getExchangeRate(), toReceive.getExchangeRate(), BigDecimal.valueOf(amount));
-
-                        if (account.withdraw(toExchange, convert)) {
-                            account.deposit(toReceive, amount);
-                            sender.sendMessage(F.getExchangeSuccess().replace("{currencycolor}", "" + toExchange.getColor()).replace("{exchangedCurr}", toExchange.getPlural())
-                                    .replace("{currEx}", String.valueOf(convert)).replace("{currencycolor2}", "" + toReceive.getColor()).replace("{receivedCurr}", toReceive.getPlural())
-                                    .replace("{amount}", String.valueOf(amount)));
+                        if (account.convert(toExchange, amount, toReceive, -1)) {
+                            sender.sendMessage(F.getExchangeSuccess()
+                                    .replace("{currencycolor}", "" + toExchange.getColor())
+                                    .replace("{ex_curr}", toExchange.format(amount))
+                                    .replace("{currencycolor2}", "" + toReceive.getColor())
+                                    .replace("{re_curr}", toReceive.getPlural()));
                         }
                     }
-
-
                 } else {
                     sender.sendMessage(F.getUnknownCurrency());
                 }
@@ -74,14 +66,15 @@ public class ExchangeCommand implements CommandExecutor {
 
                 Currency toExchange = AccountManager.getCurrency(args[0]);
                 Currency toReceive = AccountManager.getCurrency(args[2]);
-                double toExchangeAmount;
-                double toReceiveAmount;
+                double toExchangeAmount = 0.0;
+                double toReceiveAmount = 0.0;
 
                 if (toExchange != null && toReceive != null) {
-                    if (toReceive.isDecimalSupported()) {
+                    if (toExchange.isDecimalSupported() || toReceive.isDecimalSupported()) {
                         try {
-                            toExchangeAmount = Double.parseDouble(args[2]);
-                            if (toExchangeAmount <= 0.0) {
+                            toExchangeAmount = Double.parseDouble(args[1]);
+                            toReceiveAmount = Double.parseDouble(args[3]);
+                            if (toExchangeAmount <= 0.0 || toReceiveAmount <= 0) {
                                 throw new NumberFormatException();
                             }
                         } catch (NumberFormatException ex) {
@@ -89,18 +82,30 @@ public class ExchangeCommand implements CommandExecutor {
                         }
                     } else {
                         try {
-                            toExchangeAmount = Integer.parseInt(args[2]);
-                            if (toExchangeAmount <= 0.0) {
+                            toExchangeAmount = Integer.parseInt(args[1]);
+                            toReceiveAmount = Integer.parseInt(args[3]);
+                            if (toExchangeAmount <= 0.0 || toReceiveAmount <= 0) {
                                 throw new NumberFormatException();
                             }
                         } catch (NumberFormatException ex) {
                             sender.sendMessage(F.getUnvalidAmount());
                         }
                     }
-
+                    Account account = AccountManager.getAccount(sender.getName());
+                    if(account != null){
+                        if(account.convert(toExchange, toExchangeAmount, toReceive, toReceiveAmount)){
+                            sender.sendMessage(F.getExchangeSuccessCustom()
+                                    .replace("{currencycolor}", "" + toExchange.getColor())
+                                    .replace("{currEx}", toExchange.format(toExchangeAmount))
+                                    .replace("{currencycolor2}", "" + toReceive.getColor())
+                                    .replace("{receivedCurr}", toReceive.format(toReceiveAmount)));
+                        }
+                    }
                 } else {
                     sender.sendMessage(F.getUnknownCurrency());
                 }
+            }else{
+                sender.sendMessage(F.getUnknownSubCommand());
             }
         });
         return true;

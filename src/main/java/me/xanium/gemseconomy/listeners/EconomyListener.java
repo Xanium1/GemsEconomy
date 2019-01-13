@@ -43,45 +43,47 @@ public class EconomyListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         Account account = AccountManager.getAccount(event.getUniqueId());
+
         if (account == null) {
             account = new Account(event.getUniqueId(), event.getName());
-            if(GemsEconomy.getDataStore().getName().equalsIgnoreCase("mysql")){
+
+            if(!GemsEconomy.getDataStore().getName().equalsIgnoreCase("yaml")){
                 GemsEconomy.getDataStore().createAccount(account);
             }else {
                 GemsEconomy.getDataStore().saveAccount(account);
             }
+
             UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
+
         } else if (!account.getNickname().equals(event.getName()) || account.getNickname() == null) {
             account.setNickname(event.getName());
             GemsEconomy.getDataStore().saveAccount(account);
-            UtilServer.consoleLog("Name change found! Updating user " + account.getDisplayName() + "...");
+            UtilServer.consoleLog("Name change found! Updating account " + account.getDisplayName() + "...");
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            Account account = AccountManager.getAccount(player);
-            if (account != null) {
-                AccountManager.getAccounts().remove(account);
-            }
-        });
+        Account account = AccountManager.getAccount(player);
+        AccountManager.getAccounts().remove(account);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             Account account = AccountManager.getAccount(player);
-            if (account != null && player.isOnline() && !AccountManager.getAccounts().contains(account)) {
+            if (account != null && !AccountManager.getAccounts().contains(account)) {
                 AccountManager.getAccounts().add(account);
             }
         });
 
-        if(AccountManager.getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency") )){
-            player.sendMessage(F.getPrefix() + "§cYou have not made a currency yet. Please do so by \"§f/gcurr§c\".");
-        }
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (AccountManager.getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency"))) {
+                player.sendMessage(F.getPrefix() + "§cYou have not made a currency yet. Please do so by \"§e/currency§c\".");
+            }
+        }, 60);
     }
 
 }

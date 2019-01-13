@@ -12,7 +12,6 @@ import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.Currency;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +25,7 @@ public abstract class DataStore {
         this.topSupported = topSupported;
     }
 
-    private static List<DataStore> methods = new ArrayList<>();
+    private static ArrayList<DataStore> methods = new ArrayList<>();
 
     public static DataStore getMethod(String name) {
         for (DataStore store : getMethods()) {
@@ -37,7 +36,7 @@ public abstract class DataStore {
         return null;
     }
 
-    public static List<DataStore> getMethods() {
+    public static ArrayList<DataStore> getMethods() {
         return methods;
     }
 

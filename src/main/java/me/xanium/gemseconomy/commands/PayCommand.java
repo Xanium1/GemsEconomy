@@ -88,8 +88,6 @@ public class PayCommand implements CommandExecutor {
                                 if (account.getBalance(currency) >= amount) {
                                     account.setBalance(currency, account.getBalance(currency) - amount);
                                     target.setBalance(currency, target.getBalance(currency) + amount);
-                                    GemsEconomy.getDataStore().saveAccount(account);
-                                    GemsEconomy.getDataStore().saveAccount(target);
                                     if(Bukkit.getPlayer(target.getUuid()) != null){
                                         Bukkit.getPlayer(target.getUuid()).sendMessage(F.getPaidMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", sender.getName()));
                                     }

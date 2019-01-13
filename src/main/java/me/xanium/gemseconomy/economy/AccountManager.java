@@ -71,5 +71,9 @@ public class AccountManager {
     public static List<Account> getAccounts() {
         return accounts;
     }
+
+    public static List<Account> getAllAccounts() {
+        return GemsEconomy.getDataStore().getOfflineAccounts();
+    }
 }
 
