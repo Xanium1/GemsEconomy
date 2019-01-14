@@ -49,10 +49,12 @@ public class Account {
 
     public boolean convert(Currency exchanged, double exchangeAmount, Currency received, double amount) {
         if (amount != -1) {
-            modifyBalance(exchanged, getBalance(exchanged) - exchangeAmount);
-            modifyBalance(received, getBalance(received) + amount);
+            double removed = getBalance(exchanged) - exchangeAmount;
+            double added = getBalance(received) + amount;
+            modifyBalance(exchanged, removed);
+            modifyBalance(received, added);
             GemsEconomy.getDataStore().saveAccount(this);
-            GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Custom Rate] Account: " + getDisplayName() + " converted " + exchanged.format(exchangeAmount) + " to " + received.format(amount));
+            GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Custom Amount] Account: " + getDisplayName() + " converted " + exchanged.format(exchangeAmount) + " to " + received.format(amount));
             return true;
         }
         double rate;
@@ -82,7 +84,7 @@ public class Account {
                 this.modifyBalance(exchanged, removed);
                 this.modifyBalance(received, added);
                 GemsEconomy.getDataStore().saveAccount(this);
-                GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " to " + received.format(added));
+                GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
                 return true;
             }
             return false;
@@ -103,7 +105,7 @@ public class Account {
             this.modifyBalance(exchanged, removed);
             this.modifyBalance(received, added);
             GemsEconomy.getDataStore().saveAccount(this);
-            GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " to " + received.format(added));
+            GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
             return true;
         }
 
