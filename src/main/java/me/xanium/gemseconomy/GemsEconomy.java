@@ -56,15 +56,18 @@ public class GemsEconomy extends JavaPlugin {
 
 
     /**
-    Whats been done:
+     Whats been done:
      - Removed migration system from version 3.2.1
      - Found unnecessary data saving, removed it, should be some what faster now.
-     - Commands have been renamed, still works with the old names as aliases.
-     - Fixed bugs regarding data storing conversions.
+     - Commands have been renamed, still works with the old names as aliases. I've made this change because i think this plugin is worthy of overriding other "eco" plugins. You should not need any other when you got this.
+     - Fixed bugs regarding data storing conversions that made the account data not save.
      - MySQL Data store backend is now HikariCP. (A lot better performance)
-     - New logging system. A lot more understandable log files.
+     - New logging system. A lot more understandable log files!
      - New Exchange and Conversion between currency rates system. Sorry for this being delayed so many times.
-     - You can now use underscores (___) in currency singular and plural to make the plugin format the name as this: US Dollar (When you actually typed: US_Dollar)
+     - You can now use underscores (___) in currency singular and plural to make the plugin format the name as this: US Dollar (When you actually typed in this to create the currency: US_Dollar)
+     - Logging is now enabled by default :)
+     - New messages in the config file you might want to backup your old one and let it generate a new one!
+     - New permissions regarding exchange command! (gemseconomy.command.exchange.preset, gemseconomy.command.exchange.custom & gemseconomy.command.exchange.custom.other)
      */
 
     @Override

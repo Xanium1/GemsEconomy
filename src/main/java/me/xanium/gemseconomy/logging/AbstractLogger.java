@@ -106,7 +106,7 @@ public abstract class AbstractLogger implements ILogger {
         try {
             StringBuilder builder = new StringBuilder();
             appendDate(builder);
-            builder.append('[').append("LOG").append(']').append(' ');
+            builder.append('[').append("ECONOMY-LOG").append(']').append(' ');
             builder.append(message);
             writeToFile(builder.toString());
         } catch (IOException ex) {

@@ -124,7 +124,7 @@ public class YamlStorage extends DataStore {
                     double balance = getConfig().getDouble(path2);
                     Currency c = AccountManager.getCurrency(UUID.fromString(currency));
                     if (c != null) {
-                        account.setBalance(c, balance);
+                        account.modifyBalance(c, balance, false);
                     }
                 }
             }

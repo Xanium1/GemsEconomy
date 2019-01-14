@@ -244,7 +244,7 @@ public abstract class SQLDataStore extends DataStore {
                 if (currency == null) {
                     continue;
                 }
-                account.setBalance(currency, set.getDouble("balance"));
+                account.modifyBalance(currency, set.getDouble("balance"), false);
             }
         } catch (SQLException e) {
             e.printStackTrace();

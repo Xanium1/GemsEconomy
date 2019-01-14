@@ -22,6 +22,11 @@ public class ExchangeCommand implements CommandExecutor {
             if (args.length == 0) {
                 F.getExchangeHelp(sender);
             } else if (args.length == 3) {
+
+                if (!sender.hasPermission("gemseconomy.command.exchange.preset")) {
+                    sender.sendMessage(F.getExchangeNoPermPreset());
+                    return;
+                }
                 Currency toExchange = AccountManager.getCurrency(args[0]);
                 Currency toReceive = AccountManager.getCurrency(args[2]);
                 double amount;
@@ -63,7 +68,10 @@ public class ExchangeCommand implements CommandExecutor {
                 }
 
             } else if (args.length == 4) {
-
+                if (!sender.hasPermission("gemseconomy.command.exchange.custom")) {
+                    sender.sendMessage(F.getExchangeNoPermCustom());
+                    return;
+                }
                 Currency toExchange = AccountManager.getCurrency(args[0]);
                 Currency toReceive = AccountManager.getCurrency(args[2]);
                 double toExchangeAmount = 0.0;
@@ -92,8 +100,8 @@ public class ExchangeCommand implements CommandExecutor {
                         }
                     }
                     Account account = AccountManager.getAccount(sender.getName());
-                    if(account != null){
-                        if(account.convert(toExchange, toExchangeAmount, toReceive, toReceiveAmount)){
+                    if (account != null) {
+                        if (account.convert(toExchange, toExchangeAmount, toReceive, toReceiveAmount)) {
                             sender.sendMessage(F.getExchangeSuccessCustom()
                                     .replace("{currencycolor}", "" + toExchange.getColor())
                                     .replace("{currEx}", toExchange.format(toExchangeAmount))
@@ -104,7 +112,57 @@ public class ExchangeCommand implements CommandExecutor {
                 } else {
                     sender.sendMessage(F.getUnknownCurrency());
                 }
-            }else{
+            } else if (args.length == 5) {
+                if (!sender.hasPermission("gemseconomy.command.exchange.custom.other")) {
+                    sender.sendMessage(F.getExchangeNoPermCustom());
+                    return;
+                }
+                Account account = AccountManager.getAccount(args[0]);
+                if (account == null) {
+                    sender.sendMessage(F.getPlayerDoesNotExist());
+                    return;
+                }
+                Currency toExchange = AccountManager.getCurrency(args[1]);
+                Currency toReceive = AccountManager.getCurrency(args[3]);
+                double toExchangeAmount = 0.0;
+                double toReceiveAmount = 0.0;
+
+                if (toExchange != null && toReceive != null) {
+                    if (toExchange.isDecimalSupported() || toReceive.isDecimalSupported()) {
+                        try {
+                            toExchangeAmount = Double.parseDouble(args[2]);
+                            toReceiveAmount = Double.parseDouble(args[4]);
+                            if (toExchangeAmount <= 0.0 || toReceiveAmount <= 0) {
+                                throw new NumberFormatException();
+                            }
+                        } catch (NumberFormatException ex) {
+                            sender.sendMessage(F.getUnvalidAmount());
+                        }
+                    } else {
+                        try {
+                            toExchangeAmount = Integer.parseInt(args[2]);
+                            toReceiveAmount = Integer.parseInt(args[4]);
+                            if (toExchangeAmount <= 0.0 || toReceiveAmount <= 0) {
+                                throw new NumberFormatException();
+                            }
+                        } catch (NumberFormatException ex) {
+                            sender.sendMessage(F.getUnvalidAmount());
+                        }
+                    }
+
+                    if (account.convert(toExchange, toExchangeAmount, toReceive, toReceiveAmount)) {
+                        sender.sendMessage(F.getExchangeSuccessCustomOther()
+                                .replace("{player}", account.getDisplayName())
+                                .replace("{currencycolor}", "" + toExchange.getColor())
+                                .replace("{currEx}", toExchange.format(toExchangeAmount))
+                                .replace("{currencycolor2}", "" + toReceive.getColor())
+                                .replace("{receivedCurr}", toReceive.format(toReceiveAmount)));
+                    }
+
+                } else {
+                    sender.sendMessage(F.getUnknownCurrency());
+                }
+            } else {
                 sender.sendMessage(F.getUnknownSubCommand());
             }
         });

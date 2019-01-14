@@ -42,7 +42,7 @@ public class MainConfiguration {
         config.addDefault("storage", "yaml");
         config.addDefault("debug", false);
         config.addDefault("vault", false);
-        config.addDefault("transaction_log", false);
+        config.addDefault("transaction_log", true);
 
         config.addDefault("mysql.database", "minecraft");
         config.addDefault("mysql.tableprefix", "gemseconomy");
@@ -80,9 +80,13 @@ public class MainConfiguration {
         config.addDefault(path + "add", "&7You gave &a{player}&7: {currencycolor}{amount}. ");
         config.addDefault(path + "take", "&7You took {currencycolor}{amount} &7from &a{player}&7.");
         config.addDefault(path + "set", "&7You set &a{player}&7's balance to {currencycolor}{amount}&7.");
+
         config.addDefault(path + "exchange_rate_set", "&7Set the exchange rate for {currencycolor}{currency} &7to &a{amount}&7.");
+        config.addDefault(path + "exchange_success_custom_other", "&7Successfully exchanged {currencycolor}({currEx}) &7for {currencycolor2}{receivedCurr}&7 to player {player}&7.");
         config.addDefault(path + "exchange_success_custom", "&7Successfully exchanged {currencycolor}({currEx}) &7for {currencycolor2}{receivedCurr}&7.");
         config.addDefault(path + "exchange_success", "&7Successfully exchanged {currencycolor}{ex_curr} &7for equivalent value in {currencycolor2}{re_curr}&7.");
+        config.addDefault(path + "exchange_command.no_perms.preset", "&7You don't have permission to exchange currencies with a preset rate.");
+        config.addDefault(path + "exchange_command.no_perms.custom", "&7You don't have permission to exchange currencies with a custom rate.");
 
         config.addDefault(path + "balance.current", "&a{player}&7's balance is: {currencycolor}{balance}");
         config.addDefault(path + "balance.multiple", "&a{player}&7's balances:");
@@ -107,6 +111,7 @@ public class MainConfiguration {
 
         config.addDefault(path + "help.exchange_command", Arrays.asList(
                 "{prefix}&b&lExchange Help",
+                "&2&l>> &a/exchange <account> <currency_to_exchange> <amount> <currency_to_receive> <amount> &8- &7Exchange between currencies with a custom rate for an account.",
                 "&2&l>> &a/exchange <currency_to_exchange> <amount> <currency_to_receive> <amount> &8- &7Exchange between currencies with a custom rate.",
                 "&2&l>> &a/exchange <currency_to_exchange> <amount> <currency_to_receive> &8- &7Exchange with a pre-set exchange rate."));
 

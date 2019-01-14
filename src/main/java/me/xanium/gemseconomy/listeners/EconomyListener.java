@@ -6,21 +6,6 @@
  * Thank you.
  */
 
-/*
- * Decompiled with CFR 0_123.
- * 
- * Could not load the following classes:
- *  org.bukkit.entity.Player
- *  org.bukkit.event.EventHandler
- *  org.bukkit.event.EventPriority
- *  org.bukkit.event.Listener
- *  org.bukkit.event.player.AsyncPlayerPreLoginEvent
- *  org.bukkit.event.player.PlayerJoinEvent
- *  org.bukkit.event.player.PlayerQuitEvent
- *  org.bukkit.plugin.Plugin
- *  org.bukkit.scheduler.BukkitRunnable
- *  org.bukkit.scheduler.BukkitTask
- */
 package me.xanium.gemseconomy.listeners;
 
 import me.xanium.gemseconomy.GemsEconomy;

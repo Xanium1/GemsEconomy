@@ -216,7 +216,19 @@ public class F {
         return getPrefix() + colorize(cfg.getString("Messages.exchange_success_custom"));
     }
 
+    public static String getExchangeSuccessCustomOther(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_success_custom_other"));
+    }
+
     public static String getExchangeRateSet(){
         return getPrefix() + colorize(cfg.getString("Messages.exchange_rate_set"));
+    }
+
+    public static String getExchangeNoPermCustom(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_command.no_perms.custom"));
+    }
+
+    public static String getExchangeNoPermPreset(){
+        return getPrefix() + colorize(cfg.getString("Messages.exchange_command.no_perms.preset"));
     }
 }

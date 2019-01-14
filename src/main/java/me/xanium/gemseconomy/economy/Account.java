@@ -29,9 +29,10 @@ public class Account {
 
     public boolean withdraw(Currency currency, double amount) {
         if (hasEnough(currency, amount)) {
-            setBalance(currency, getBalance(currency) - amount);
+            double finalAmount = getBalance(currency) - amount;
+            this.modifyBalance(currency, finalAmount, false);
             GemsEconomy.getDataStore().saveAccount(this);
-            GemsEconomy.getInstance().getEconomyLogger().log("[WITHDRAW] Account: " + getDisplayName() + " were withdrawn: " + currency.format(amount));
+            GemsEconomy.getInstance().getEconomyLogger().log("[WITHDRAW] Account: " + getDisplayName() + " were withdrawn: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
         return false;
@@ -39,9 +40,10 @@ public class Account {
 
     public boolean deposit(Currency currency, double amount) {
         if (isCanReceiveCurrency()) {
-            setBalance(currency, getBalance(currency) + amount);
+            double finalAmount = getBalance(currency) + amount;
+            this.modifyBalance(currency, finalAmount, false);
             GemsEconomy.getDataStore().saveAccount(this);
-            GemsEconomy.getInstance().getEconomyLogger().log("[DEPOSIT] Account: " + getDisplayName() + " were deposited: " + currency.format(amount));
+            GemsEconomy.getInstance().getEconomyLogger().log("[DEPOSIT] Account: " + getDisplayName() + " were deposited: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
         return false;
@@ -51,8 +53,8 @@ public class Account {
         if (amount != -1) {
             double removed = getBalance(exchanged) - exchangeAmount;
             double added = getBalance(received) + amount;
-            modifyBalance(exchanged, removed);
-            modifyBalance(received, added);
+            modifyBalance(exchanged, removed, false);
+            modifyBalance(received, added, false);
             GemsEconomy.getDataStore().saveAccount(this);
             GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Custom Amount] Account: " + getDisplayName() + " converted " + exchanged.format(exchangeAmount) + " to " + received.format(amount));
             return true;
@@ -81,8 +83,8 @@ public class Account {
             }
 
             if(hasEnough(exchanged, exchangeAmount)){
-                this.modifyBalance(exchanged, removed);
-                this.modifyBalance(received, added);
+                this.modifyBalance(exchanged, removed, false);
+                this.modifyBalance(received, added, false);
                 GemsEconomy.getDataStore().saveAccount(this);
                 GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
                 return true;
@@ -102,8 +104,8 @@ public class Account {
         }
 
         if(hasEnough(exchanged, finalAmount)){
-            this.modifyBalance(exchanged, removed);
-            this.modifyBalance(received, added);
+            this.modifyBalance(exchanged, removed, false);
+            this.modifyBalance(received, added, false);
             GemsEconomy.getDataStore().saveAccount(this);
             GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
             return true;
@@ -118,8 +120,11 @@ public class Account {
         GemsEconomy.getDataStore().saveAccount(this);
     }
 
-    private void modifyBalance(Currency currency, double amount){
+    public void modifyBalance(Currency currency, double amount, boolean save){
         getBalances().put(currency, amount);
+        if(save){
+            GemsEconomy.getDataStore().saveAccount(this);
+        }
     }
 
     public double getBalance(Currency currency) {

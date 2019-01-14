@@ -33,8 +33,12 @@ public class BalanceCommand implements CommandExecutor {
             Account account = null;
             if (args.length == 0 && sender instanceof Player) {
                 account = AccountManager.getAccount((Player) sender);
-            } else if (sender.hasPermission("gemseconomy.command.balance.other") && args.length == 1) {
+            }
+            else if (sender.hasPermission("gemseconomy.command.balance.other") && args.length == 1) {
                 account = AccountManager.getAccount(args[0]);
+            }else{
+                sender.sendMessage(F.getNoPerms());
+                return;
             }
             if (account != null) {
                 if (AccountManager.getCurrencies().size() == 0) {
