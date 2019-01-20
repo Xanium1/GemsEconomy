@@ -9,7 +9,10 @@
 package me.xanium.gemseconomy.economy;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.event.GemsConversionEvent;
+import me.xanium.gemseconomy.event.GemsTransactionEvent;
 import me.xanium.gemseconomy.utils.UtilServer;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +32,10 @@ public class Account {
 
     public boolean withdraw(Currency currency, double amount) {
         if (hasEnough(currency, amount)) {
+            GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.WITHDRAW);
+            Bukkit.getPluginManager().callEvent(event);
+            if(event.isCancelled())return false;
+
             double finalAmount = getBalance(currency) - amount;
             this.modifyBalance(currency, finalAmount, false);
             GemsEconomy.getDataStore().saveAccount(this);
@@ -40,6 +47,11 @@ public class Account {
 
     public boolean deposit(Currency currency, double amount) {
         if (isCanReceiveCurrency()) {
+
+            GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.DEPOSIT);
+            Bukkit.getPluginManager().callEvent(event);
+            if(event.isCancelled())return false;
+
             double finalAmount = getBalance(currency) + amount;
             this.modifyBalance(currency, finalAmount, false);
             GemsEconomy.getDataStore().saveAccount(this);
@@ -50,6 +62,10 @@ public class Account {
     }
 
     public boolean convert(Currency exchanged, double exchangeAmount, Currency received, double amount) {
+        GemsConversionEvent event = new GemsConversionEvent(exchanged, received, this, exchangeAmount, amount);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled())return false;
+
         if (amount != -1) {
             double removed = getBalance(exchanged) - exchangeAmount;
             double added = getBalance(received) + amount;
@@ -115,11 +131,21 @@ public class Account {
     }
 
     public void setBalance(Currency currency, double amount) {
+        GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.SET);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled())return;
+
         getBalances().put(currency, amount);
         GemsEconomy.getInstance().getEconomyLogger().log("[BALANCE SET] Account: " + getDisplayName() + " were set to: " + currency.format(amount));
         GemsEconomy.getDataStore().saveAccount(this);
     }
 
+    /**
+     * DO NOT USE UNLESS YOU HAVE VIEWED WHAT THIS DOES!
+     * @param currency - Currency to modify
+     * @param amount - Amount of cash to modify.
+     * @param save - Save the account or not. Should be done async!
+     */
     public void modifyBalance(Currency currency, double amount, boolean save){
         getBalances().put(currency, amount);
         if(save){

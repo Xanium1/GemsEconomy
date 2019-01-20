@@ -12,6 +12,7 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.event.GemsPayEvent;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -86,6 +87,10 @@ public class PayCommand implements CommandExecutor {
                         if (target.getUuid() != account.getUuid()) {
                             if (target.isCanReceiveCurrency()) {
                                 if (account.hasEnough(currency, amount)) {
+                                    GemsPayEvent event = new GemsPayEvent(currency, account, target, amount);
+                                    Bukkit.getPluginManager().callEvent(event);
+                                    if(event.isCancelled())return;
+
                                     double accBal = account.getBalance(currency) - amount;
                                     double tarBal = target.getBalance(currency) + amount;
                                     account.modifyBalance(currency, accBal, true);
