@@ -86,7 +86,7 @@ public class F {
     public static String getUnknownCurrency() { return getPrefix() + colorize(cfg.getString("Messages.unknownCurrency")); }
 
     public static String getUnknownSubCommand() {
-        return getPrefix() + colorize(cfg.getString("unknownCommand"));
+        return getPrefix() + colorize(cfg.getString("Messages.unknownCommand"));
     }
 
     public static void getManageHelp(CommandSender sender) {
