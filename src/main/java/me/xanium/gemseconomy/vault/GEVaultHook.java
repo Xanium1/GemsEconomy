@@ -8,9 +8,11 @@
 
 package me.xanium.gemseconomy.vault;
 
+import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.utils.UtilServer;
 import net.milkbowl.vault.economy.AbstractEconomy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
@@ -85,6 +87,7 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public double getBalance(String playerName) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + playerName);
         Account user = AccountManager.getAccount(playerName);
         Currency currency = AccountManager.getDefaultCurrency();
         return user.getBalance(currency);
@@ -92,6 +95,7 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public double getBalance(OfflinePlayer player) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + player.getName() + "(" + player.getUniqueId() + ")");
         Account user = AccountManager.getAccount(player.getUniqueId());
         Currency currency = AccountManager.getDefaultCurrency();
         return user.getBalance(currency);
@@ -99,6 +103,8 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, double amount) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + player.getName() + "(" + player.getUniqueId() + ")");
+
         if (amount < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
         }
@@ -122,6 +128,8 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + player.getName() + "(" + player.getUniqueId()+ ")");
+
         if (amount < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
         }
@@ -145,6 +153,8 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public EconomyResponse withdrawPlayer(String player, double amount) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + player);
+
         if (amount < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
         }
@@ -168,6 +178,7 @@ public class GEVaultHook extends AbstractEconomy {
 
     @Override
     public EconomyResponse depositPlayer(String player, double amount) {
+        if(GemsEconomy.getInstance().isDebug())UtilServer.consoleLog("Lookup name: " + player);
         if (amount < 0) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
         }

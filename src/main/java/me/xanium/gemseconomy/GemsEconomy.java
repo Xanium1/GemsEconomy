@@ -48,8 +48,8 @@ public class GemsEconomy extends JavaPlugin {
 
 
     /**
-     * Todo Liste:
-     *
+     * Todo List:
+     * Make servers not crash when bots attack. Just need to make it not make accounts until later on.
      *
      */
 

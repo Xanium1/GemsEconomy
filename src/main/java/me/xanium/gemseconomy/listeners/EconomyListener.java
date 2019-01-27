@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EconomyListener implements Listener {
@@ -26,25 +26,30 @@ public class EconomyListener implements Listener {
     private final GemsEconomy plugin = GemsEconomy.getInstance();
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        Account account = AccountManager.getAccount(event.getUniqueId());
+    public void onPreLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
 
-        if (account == null) {
-            account = new Account(event.getUniqueId(), event.getName());
+        GemsEconomy.doAsync(() -> {
+            Account account = AccountManager.getAccount(player.getUniqueId());
 
-            if(!GemsEconomy.getDataStore().getName().equalsIgnoreCase("yaml")){
-                GemsEconomy.getDataStore().createAccount(account);
-            }else {
+            if (account == null) {
+                account = new Account(player.getUniqueId(), player.getName());
+
+                if (!GemsEconomy.getDataStore().getName().equalsIgnoreCase("yaml")) {
+                    GemsEconomy.getDataStore().createAccount(account);
+                } else {
+                    GemsEconomy.getDataStore().saveAccount(account);
+                }
+
+                UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
+
+            } else if (!account.getNickname().equals(player.getName()) || account.getNickname() == null) {
+                account.setNickname(player.getName());
                 GemsEconomy.getDataStore().saveAccount(account);
+                UtilServer.consoleLog("Name change found! Updating account " + account.getDisplayName() + "...");
             }
-
-            UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
-
-        } else if (!account.getNickname().equals(event.getName()) || account.getNickname() == null) {
-            account.setNickname(event.getName());
-            GemsEconomy.getDataStore().saveAccount(account);
-            UtilServer.consoleLog("Name change found! Updating account " + account.getDisplayName() + "...");
-        }
+        });
     }
 
     @EventHandler
@@ -54,7 +59,7 @@ public class EconomyListener implements Listener {
         AccountManager.getAccounts().remove(account);
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {

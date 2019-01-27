@@ -9,6 +9,8 @@
 package me.xanium.gemseconomy.vault;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.economy.AccountManager;
+import me.xanium.gemseconomy.utils.UtilServer;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -27,6 +29,11 @@ public class VaultHandler {
         try {
             if (this.economy == null) {
                 this.economy = new GEVaultHook();
+            }
+
+            if(AccountManager.getDefaultCurrency() == null){
+                UtilServer.consoleLog("No Default currency found. Vault hook not enabling.");
+                return;
             }
 
             ServicesManager sm = Bukkit.getServicesManager();
