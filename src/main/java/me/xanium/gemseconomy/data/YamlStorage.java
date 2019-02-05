@@ -53,7 +53,9 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+
+    }
 
     @Override
     public void loadCurrencies() {

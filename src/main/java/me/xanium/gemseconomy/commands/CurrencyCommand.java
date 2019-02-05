@@ -282,19 +282,17 @@ public class CurrencyCommand implements CommandExecutor {
                         DataStore current = GemsEconomy.getDataStore();
                         DataStore ds = DataStore.getMethod(method);
 
-                        if(current == null) {
+                        if (current == null) {
                             sender.sendMessage(F.getPrefix() + "Current Data Store is null. Did something go wrong on startup?");
                             return;
                         }
 
-                        if(ds!=null){
-                            if(current.getName().equalsIgnoreCase(ds.getName())){
+                        if (ds != null) {
+                            if (current.getName().equalsIgnoreCase(ds.getName())) {
                                 sender.sendMessage(F.getPrefix() + "You can't convert to the same datastore.");
                                 return;
                             }
-                        }
 
-                        if (ds != null) {
                             plugin.getConfig().set("storage", ds.getName());
                             plugin.saveConfig();
 
@@ -309,12 +307,12 @@ public class CurrencyCommand implements CommandExecutor {
                             sender.sendMessage(F.getPrefix() + "§aStored currencies.");
                             AccountManager.getCurrencies().clear();
 
-                            if(plugin.isDebug()){
-                                for(Account a : offline){
+                            if (plugin.isDebug()) {
+                                for (Account a : offline) {
                                     UtilServer.consoleLog("Account: " + a.getDisplayName() + " has " + a.getBalances().size() + " balances. Map Print: " + a.getBalances().toString());
                                 }
 
-                                for(Currency c : currencies){
+                                for (Currency c : currencies) {
                                     UtilServer.consoleLog("Currency: " + c.getSingular() + "(" + c.getPlural() + "): " + c.format(100));
                                 }
                             }
@@ -388,6 +386,57 @@ public class CurrencyCommand implements CommandExecutor {
                         } else {
                             sender.sendMessage(F.getPrefix() + "§cData Storing method not found.");
                         }
+                    }else{
+                        sender.sendMessage(F.getCurrencyUsage_Convert());
+                    }
+                } else if (cmd.equalsIgnoreCase("backend")) {
+                    if(args.length == 2) {
+                        String method = args[1];
+                        DataStore current = GemsEconomy.getDataStore();
+                        DataStore ds = DataStore.getMethod(method);
+
+                        if (current == null) {
+                            sender.sendMessage(F.getPrefix() + "Current Data Store is null. Did something go wrong on startup?");
+                            return;
+                        }
+
+                        if (ds != null) {
+                            if (current.getName().equalsIgnoreCase(ds.getName())) {
+                                sender.sendMessage(F.getPrefix() + "You can't convert to the same datastore.");
+                                return;
+                            }
+
+
+                            plugin.getConfig().set("storage", ds.getName());
+                            plugin.saveConfig();
+
+                            sender.sendMessage(F.getPrefix() + "§aSaving data and closing up...");
+
+                            if (GemsEconomy.getDataStore() != null) {
+                                GemsEconomy.getDataStore().close();
+
+                                AccountManager.getAccounts().clear();
+                                AccountManager.getCurrencies().clear();
+
+                                sender.sendMessage(F.getPrefix() + "§aSuccessfully shutdown. Booting..");
+                            }
+
+                            sender.sendMessage(F.getPrefix() + "§aSwitching from §f" + current.getName() + " §ato §f" + ds.getName() + "§a.");
+
+                            plugin.initializeDataStore(ds.getName(), true);
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                GemsEconomy.getDataStore().loadAccount(players.getUniqueId());
+                            }
+                            sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
+                        }
+                    } else{
+                        sender.sendMessage(F.getCurrencyUsage_Backend());
                     }
                 } else {
                     sender.sendMessage(F.getUnknownSubCommand());

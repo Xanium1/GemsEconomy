@@ -15,7 +15,7 @@ import me.xanium.gemseconomy.data.SQLiteDataStore;
 import me.xanium.gemseconomy.data.YamlStorage;
 import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.economy.ChequeManager;
-import me.xanium.gemseconomy.file.MainConfiguration;
+import me.xanium.gemseconomy.file.Configuration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
 import me.xanium.gemseconomy.logging.EcoLogger;
 import me.xanium.gemseconomy.logging.EconomyLogger;
@@ -54,8 +54,8 @@ public class GemsEconomy extends JavaPlugin {
 
     @Override
     public void onLoad(){
-        MainConfiguration mainConfiguration = new MainConfiguration(this);
-        mainConfiguration.loadDefaultConfig();
+        Configuration configuration = new Configuration(this);
+        configuration.loadDefaultConfig();
 
         setDebug(getConfig().getBoolean("debug"));
         setVault(getConfig().getBoolean("vault"));

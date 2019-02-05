@@ -57,6 +57,10 @@ public class GemsConversionEvent extends Event implements Cancellable {
         return handlerList;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlerList;
+    }
+
     @Override
     public boolean isCancelled() {
         return cancel;

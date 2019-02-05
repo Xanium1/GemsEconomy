@@ -201,6 +201,12 @@ public class F {
     public static String getCurrencyUsage_Decimals() { return get("Messages.usage.currency_decimals"); }
     public static String getCurrencyUsage_Symbol() { return get("Messages.usage.currency_symbol"); }
     public static String getCurrencyUsage_Rate() { return get("Messages.usage.currency_setrate"); }
+    public static String getCurrencyUsage_Backend() {
+        return get("Messages.usage.currency_backend");
+    }
+    public static String getCurrencyUsage_Convert() {
+        return get("Messages.usage.currency_convert");
+    }
 
     public static void sendCurrencyUsage(CommandSender sender){
         for(String s : getList("Messages.help.currency_command")){

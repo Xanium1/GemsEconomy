@@ -14,11 +14,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Arrays;
 
-public class MainConfiguration {
+public class Configuration {
 
     private GemsEconomy plugin;
 
-    public MainConfiguration(GemsEconomy plugin) {
+    public Configuration(GemsEconomy plugin) {
         this.plugin = plugin;
     }
 
@@ -128,6 +128,7 @@ public class MainConfiguration {
                 "&2&l>> &a/currency create <singular> <plural> &8- &7Create a currency.",
                 "&2&l>> &a/currency delete <plural> &8- &7Delete a currency.",
                 "&2&l>> &a/currency convert <method> &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!",
+                "&2&l>> &a/currency backend <method> &8- &7Switch backend. This does not convert.",
                 "&2&l>> &a/currency view <plural> &8- &7View information about a currency.",
                 "&2&l>> &a/currency list &8- &7List of currencies.",
                 "&2&l>> &a/currency symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.",
@@ -142,6 +143,7 @@ public class MainConfiguration {
         config.addDefault(path + "usage.currency_create", "&2&l>> &a/currency create <singular> <plural> &8- &7Create a currency.");
         config.addDefault(path + "usage.currency_delete", "&2&l>> &a/currency delete <plural> &8- &7Delete a currency.");
         config.addDefault(path + "usage.currency_convert", "&2&l>> &a/currency convert <method> &8- &7Convert storage method. WARN: Take backups first and make sure the storage you are switching to is empty!");
+        config.addDefault(path + "usage.currency_backend", "&2&l>> &a/currency backend <method> &8- &7Switch backend. This does not convert.");
         config.addDefault(path + "usage.currency_view", "&2&l>> &a/currency view <plural> &8- &7View information about a currency.");
         config.addDefault(path + "usage.currency_list", "&2&l>> &a/currency list &8- &7List of currencies.");
         config.addDefault(path + "usage.currency_symbol", "&2&l>> &a/currency symbol <plural> <char|remove> &8- &7Select a symbol for a currency or remove it.");
