@@ -57,7 +57,8 @@ public abstract class SQLDataStore extends DataStore {
 
     private void checkConnection() {
         if (!isConnected()) {
-            throw new IllegalStateException("Database is not connected!");
+            UtilServer.consoleLog("Connection lost to database. Trying to reconnect...");
+            reviveConnection();
         }
     }
 
