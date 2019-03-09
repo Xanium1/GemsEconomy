@@ -27,6 +27,7 @@ public class MySQLStorage extends SQLDataStore {
         hikariConfig.setJdbcUrl("jdbc:mysql://"+ host + ":" + port + "/" + database + "?allowPublicKeyRetrieval=true&useSSL=false");
         hikariConfig.setPassword(password);
         hikariConfig.setUsername(username);
+        hikariConfig.setMaxLifetime(1500000);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
