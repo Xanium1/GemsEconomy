@@ -33,12 +33,11 @@ public class Account {
     public boolean withdraw(Currency currency, double amount) {
         if (hasEnough(currency, amount)) {
             GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.WITHDRAW);
-            Bukkit.getPluginManager().callEvent(event);
+            GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
             if(event.isCancelled())return false;
 
             double finalAmount = getBalance(currency) - amount;
-            this.modifyBalance(currency, finalAmount, false);
-            GemsEconomy.getDataStore().saveAccount(this);
+            this.modifyBalance(currency, finalAmount, true);
             GemsEconomy.getInstance().getEconomyLogger().log("[WITHDRAW] Account: " + getDisplayName() + " were withdrawn: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
@@ -49,12 +48,11 @@ public class Account {
         if (isCanReceiveCurrency()) {
 
             GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.DEPOSIT);
-            Bukkit.getPluginManager().callEvent(event);
+            GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
             if(event.isCancelled())return false;
 
             double finalAmount = getBalance(currency) + amount;
-            this.modifyBalance(currency, finalAmount, false);
-            GemsEconomy.getDataStore().saveAccount(this);
+            this.modifyBalance(currency, finalAmount, true);
             GemsEconomy.getInstance().getEconomyLogger().log("[DEPOSIT] Account: " + getDisplayName() + " were deposited: " + currency.format(amount) + " and now has " + currency.format(finalAmount));
             return true;
         }
@@ -63,7 +61,7 @@ public class Account {
 
     public boolean convert(Currency exchanged, double exchangeAmount, Currency received, double amount) {
         GemsConversionEvent event = new GemsConversionEvent(exchanged, received, this, exchangeAmount, amount);
-        Bukkit.getPluginManager().callEvent(event);
+        GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
         if(event.isCancelled())return false;
 
         if (amount != -1) {

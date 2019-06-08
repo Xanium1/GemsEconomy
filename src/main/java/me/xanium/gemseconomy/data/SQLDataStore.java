@@ -44,6 +44,10 @@ public abstract class SQLDataStore extends DataStore {
         return this.connection;
     }
 
+    private final String SAVE_CURRENCY = "INSERT INTO `" + getTablePrefix() + "_currencies` (`uuid`, `name_singular`, `name_plural`, `default_balance`, `symbol`, `decimals_supported`, `is_default`, `payable`, `color`, `exchange_rate`) VALUES(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE `uuid` = ?, `name_singular` = ?, `name_plural` = ?, `default_balance` = ?, `symbol` = ?, `decimals_supported` = ?, `ìs_default` = ?, ``payable` = ?, `color` = ?, `èxchange_rate` = ?";
+    private final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `nickname` = ?, `uuid` = ?, `payable` = ?";
+    private final String SAVE_BALANCE = "INSERT INTO `" + getTablePrefix() + "_balances` (`account_id`, `currency_id`, `balance`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `account_id` = ?, `currency_id` = ?, `balance` = ?";
+
     private boolean isConnected() {
         if (connection == null) {
             return false;
@@ -250,6 +254,10 @@ public abstract class SQLDataStore extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        if(!AccountManager.getAccounts().contains(account)){
+            AccountManager.getAccounts().add(account);
+        }
         return account;
     }
 
@@ -348,6 +356,10 @@ public abstract class SQLDataStore extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        if(!AccountManager.getAccounts().contains(account)){
+            AccountManager.getAccounts().add(account);
+        }
     }
 
     @Override
@@ -373,31 +385,30 @@ public abstract class SQLDataStore extends DataStore {
             rs.close();
             for (Currency currency : AccountManager.getCurrencies()) {
                 double balance = account.getBalance(currency.getPlural());
-                if(balance == -100){
+                if (balance == -100) {
                     balance = currency.getDefaultBalance();
                 }
 
-                if (balance != currency.getDefaultBalance()) {
-                    stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_balances WHERE account_id = ? AND currency_id = ? LIMIT 1");
+                stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_balances WHERE account_id = ? AND currency_id = ? LIMIT 1");
+                stmt.setString(1, account.getUuid().toString());
+                stmt.setString(2, currency.getUuid().toString());
+                rs = stmt.executeQuery();
+
+                if (!rs.next()) {
+                    stmt = this.getConnection().prepareStatement("INSERT INTO " + this.getTablePrefix() + "_balances (account_id, currency_id, balance) VALUES (?, ?, ?)");
                     stmt.setString(1, account.getUuid().toString());
                     stmt.setString(2, currency.getUuid().toString());
-                    rs = stmt.executeQuery();
-
-                    if (!rs.next()) {
-                        stmt = this.getConnection().prepareStatement("INSERT INTO " + this.getTablePrefix() + "_balances (account_id, currency_id, balance) VALUES (?, ?, ?)");
-                        stmt.setString(1, account.getUuid().toString());
-                        stmt.setString(2, currency.getUuid().toString());
-                        stmt.setDouble(3, balance);
-                        stmt.execute();
-                    } else {
-                        stmt = this.getConnection().prepareStatement("UPDATE " + this.getTablePrefix() + "_balances SET balance = ? WHERE account_id = ? AND currency_id = ?");
-                        stmt.setDouble(1, balance);
-                        stmt.setString(2, account.getUuid().toString());
-                        stmt.setString(3, currency.getUuid().toString());
-                        stmt.execute();
-                    }
-                    rs.close();
+                    stmt.setDouble(3, balance);
+                    stmt.execute();
+                } else {
+                    stmt = this.getConnection().prepareStatement("UPDATE " + this.getTablePrefix() + "_balances SET balance = ? WHERE account_id = ? AND currency_id = ?");
+                    stmt.setDouble(1, balance);
+                    stmt.setString(2, account.getUuid().toString());
+                    stmt.setString(3, currency.getUuid().toString());
+                    stmt.execute();
                 }
+                rs.close();
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

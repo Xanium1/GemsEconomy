@@ -72,7 +72,7 @@ public class PayCommand implements CommandExecutor {
                 } else {
                     try {
                         amount = Integer.parseInt(args[1]);
-                        if (amount <= 0.0) {
+                        if (amount <= 0) {
                             throw new NumberFormatException();
                         }
                     } catch (NumberFormatException ex) {
@@ -88,7 +88,7 @@ public class PayCommand implements CommandExecutor {
                             if (target.isCanReceiveCurrency()) {
                                 if (account.hasEnough(currency, amount)) {
                                     GemsPayEvent event = new GemsPayEvent(currency, account, target, amount);
-                                    Bukkit.getPluginManager().callEvent(event);
+                                    GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
                                     if(event.isCancelled())return;
 
                                     double accBal = account.getBalance(currency) - amount;

@@ -158,6 +158,9 @@ public class YamlStorage extends DataStore {
                         Account account = new Account(UUID.fromString(uuid), nick);
                         account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
                         loadBalances(account);
+                        if(!AccountManager.getAccounts().contains(account)){
+                            AccountManager.getAccounts().add(account);
+                        }
                         return account;
                     }
                 }
@@ -177,6 +180,9 @@ public class YamlStorage extends DataStore {
             Account account = new Account(uuid, nick);
             account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
             loadBalances(account);
+            if(!AccountManager.getAccounts().contains(account)){
+                AccountManager.getAccounts().add(account);
+            }
             return account;
         }
         return null;

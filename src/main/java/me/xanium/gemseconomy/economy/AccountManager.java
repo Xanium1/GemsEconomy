@@ -48,6 +48,16 @@ public class AccountManager {
         return currencies;
     }
 
+    public static void removeAccount(Player player){
+        for(int i = 0; i < accounts.size(); i++){
+            Account a = getAccounts().get(i);
+            if(a.getUuid().equals(player.getUniqueId())){
+                accounts.remove(i);
+                break;
+            }
+        }
+    }
+
     public static Account getAccount(Player player) {
         return AccountManager.getAccount(player.getUniqueId());
     }

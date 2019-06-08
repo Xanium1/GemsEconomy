@@ -30,7 +30,7 @@ public class BalanceCommand implements CommandExecutor {
                 sender.sendMessage(F.getNoPerms());
                 return;
             }
-            Account account = null;
+            Account account;
             if (args.length == 0 && sender instanceof Player) {
                 account = AccountManager.getAccount((Player) sender);
             }

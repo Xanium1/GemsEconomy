@@ -47,6 +47,21 @@ public class GemsEconomy extends JavaPlugin {
     private boolean disabling = false;
 
     /**
+     * Changes:
+     * Fixed the Cache, I made a cache for accounts but didn't actually use it.
+     * So this would bring a performance boost regarding account lookups. (Data reading)
+     * Fixed a money dupe bug when a player joins first time, receives money and can pay infinite until they rejoin.
+     *
+     *
+     * Added support for 1.14!
+     *
+     * Please let me know if you find bugs!
+     * PM me or contact me on discord!
+     *
+     */
+
+
+    /**
      * Todo List:
      *
      *

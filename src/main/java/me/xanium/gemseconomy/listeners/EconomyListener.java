@@ -26,7 +26,7 @@ public class EconomyListener implements Listener {
     private final GemsEconomy plugin = GemsEconomy.getInstance();
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreLogin(PlayerLoginEvent event) {
+    public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
 
@@ -40,6 +40,9 @@ public class EconomyListener implements Listener {
                     GemsEconomy.getDataStore().createAccount(account);
                 } else {
                     GemsEconomy.getDataStore().saveAccount(account);
+                    if(!AccountManager.getAccounts().contains(account)){
+                        AccountManager.getAccounts().add(account);
+                    }
                 }
 
                 UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
@@ -55,14 +58,13 @@ public class EconomyListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Account account = AccountManager.getAccount(player);
-        AccountManager.getAccounts().remove(account);
+        AccountManager.removeAccount(player);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
             Account account = AccountManager.getAccount(player);
             if (account != null && !AccountManager.getAccounts().contains(account)) {
                 AccountManager.getAccounts().add(account);
