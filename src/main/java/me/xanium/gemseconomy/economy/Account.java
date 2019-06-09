@@ -130,7 +130,7 @@ public class Account {
 
     public void setBalance(Currency currency, double amount) {
         GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.SET);
-        Bukkit.getPluginManager().callEvent(event);
+        GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
         if(event.isCancelled())return;
 
         getBalances().put(currency, amount);
