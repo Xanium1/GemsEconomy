@@ -143,6 +143,39 @@ public abstract class SQLDataStore extends DataStore {
     }
 
     @Override
+    public void updateCurrency(Currency currency) {
+        if (this.getConnection() == null) {
+            return;
+        }
+        this.reviveConnection();
+        try {
+            PreparedStatement stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_currencies WHERE uuid = ? LIMIT 1;");
+            stmt.setString(1, currency.getUuid().toString());
+            ResultSet set = stmt.executeQuery();
+            while (set.next()) {
+                double defaultBalance = set.getDouble("default_balance");
+                String symbol = set.getString("symbol");
+                boolean decimals = set.getInt("decimals_supported") == 1;
+                boolean isDefault = set.getInt("is_default") == 1;
+                boolean payable = set.getInt("payable") == 1;
+                ChatColor color = ChatColor.valueOf(set.getString("color"));
+                double exchangeRate = set.getDouble("exchange_rate");
+
+                currency.setDefaultBalance(defaultBalance);
+                currency.setSymbol(symbol);
+                currency.setDecimalSupported(decimals);
+                currency.setDefaultCurrency(isDefault);
+                currency.setPayable(payable);
+                currency.setColor(color);
+                currency.setExchangeRate(exchangeRate);
+                UtilServer.consoleLog("Updated currency: " + currency.getPlural());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void saveCurrency(Currency currency) {
         checkConnection();
         try {
@@ -178,6 +211,8 @@ public abstract class SQLDataStore extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        plugin.getUpdateForwarder().sendUpdateMessage("currency", currency.getUuid().toString());
     }
 
     @Override
@@ -359,6 +394,7 @@ public abstract class SQLDataStore extends DataStore {
 
         if(!AccountManager.getAccounts().contains(account)){
             AccountManager.getAccounts().add(account);
+            plugin.getUpdateForwarder().sendUpdateMessage("account", account.getUuid().toString());
         }
     }
 
@@ -413,6 +449,8 @@ public abstract class SQLDataStore extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        plugin.getUpdateForwarder().sendUpdateMessage("account", account.getUuid().toString());
     }
 
     @Override

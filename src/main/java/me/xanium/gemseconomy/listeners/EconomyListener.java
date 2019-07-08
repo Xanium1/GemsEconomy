@@ -58,7 +58,7 @@ public class EconomyListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        AccountManager.removeAccount(player);
+        AccountManager.removeAccount(player.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

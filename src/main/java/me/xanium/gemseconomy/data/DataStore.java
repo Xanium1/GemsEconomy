@@ -8,6 +8,7 @@
 
 package me.xanium.gemseconomy.data;
 
+import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.economy.Account;
 import me.xanium.gemseconomy.economy.Currency;
 
@@ -16,6 +17,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class DataStore {
+
+    public final GemsEconomy plugin = GemsEconomy.getInstance();
 
     private String name;
     private boolean topSupported;
@@ -45,6 +48,8 @@ public abstract class DataStore {
     public abstract void close();
 
     public abstract void loadCurrencies();
+
+    public abstract void updateCurrency(Currency currency);
 
     public abstract void saveCurrency(Currency currency);
 

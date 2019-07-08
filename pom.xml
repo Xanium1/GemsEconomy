@@ -14,7 +14,7 @@
 
     <groupId>me.xanium</groupId>
     <artifactId>GemsEconomy</artifactId>
-    <version>4.8.1</version>
+    <version>4.8.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,6 +55,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <outputDirectory>D:\Programmering\TestServer\BungeeCord\server1\plugins</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -71,13 +79,17 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>reserve-repo</id>
+            <url>https://dl.bintray.com/theneweconomy/java/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.14.2-R0.1-SNAPSHOT</version>
+            <version>1.14.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -96,6 +108,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.tnemc</groupId>
+            <artifactId>Reserve</artifactId>
+            <version>0.1.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

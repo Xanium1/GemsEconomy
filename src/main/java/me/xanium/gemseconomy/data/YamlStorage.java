@@ -216,6 +216,9 @@ public class YamlStorage extends DataStore {
         }
     }
 
+    @Override
+    public void updateCurrency(Currency currency) {}
+
     public YamlConfiguration getConfig() {
         return configuration;
     }

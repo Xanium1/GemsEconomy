@@ -8,6 +8,7 @@
 
 package me.xanium.gemseconomy;
 
+import me.xanium.gemseconomy.bungee.UpdateForwarder;
 import me.xanium.gemseconomy.commands.*;
 import me.xanium.gemseconomy.data.DataStore;
 import me.xanium.gemseconomy.data.MySQLStorage;
@@ -39,6 +40,7 @@ public class GemsEconomy extends JavaPlugin {
     private NMSVersion nmsVersion;
     private Metrics metrics;
     private ILogger economyLogger;
+    private UpdateForwarder updateForwarder;
 
     private boolean debug = false;
     private boolean vault = false;
@@ -85,6 +87,7 @@ public class GemsEconomy extends JavaPlugin {
         chequeManager = new ChequeManager(this);
         economyLogger = new EcoLogger(this);
         metrics = new Metrics(this);
+        updateForwarder = new UpdateForwarder();
 
         initializeDataStore(getConfig().getString("storage"), true);
 
@@ -104,6 +107,9 @@ public class GemsEconomy extends JavaPlugin {
         }else{
             UtilServer.consoleLog("Vault compatibility is disabled.");
         }
+
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", updateForwarder);
 
         if(isLogging()) {
             getEconomyLogger().save();
@@ -236,5 +242,9 @@ public class GemsEconomy extends JavaPlugin {
 
     public boolean isDisabling() {
         return disabling;
+    }
+
+    public UpdateForwarder getUpdateForwarder() {
+        return updateForwarder;
     }
 }
