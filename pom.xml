@@ -14,7 +14,7 @@
 
     <groupId>me.xanium</groupId>
     <artifactId>GemsEconomy</artifactId>
-    <version>4.8.2</version>
+    <version>4.8.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +60,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <outputDirectory>D:\Programmering\TestServer\BungeeCord\server1\plugins</outputDirectory>
+                    <outputDirectory>E:\Programmering\TestServer\BungeeCord\server1\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
@@ -103,12 +103,6 @@
             <artifactId>HikariCP</artifactId>
             <version>3.3.1</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.tnemc</groupId>

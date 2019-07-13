@@ -289,10 +289,6 @@ public abstract class SQLDataStore extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        if(!AccountManager.getAccounts().contains(account)){
-            AccountManager.getAccounts().add(account);
-        }
         return account;
     }
 
@@ -392,10 +388,7 @@ public abstract class SQLDataStore extends DataStore {
             e.printStackTrace();
         }
 
-        if(!AccountManager.getAccounts().contains(account)){
-            AccountManager.getAccounts().add(account);
-            plugin.getUpdateForwarder().sendUpdateMessage("account", account.getUuid().toString());
-        }
+        plugin.getUpdateForwarder().sendUpdateMessage("account", account.getUuid().toString());
     }
 
     @Override
