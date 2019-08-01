@@ -139,6 +139,7 @@ public class GEVaultHook extends AbstractEconomy {
         String error = null;
 
         Account user = AccountManager.getAccount(player.getUniqueId());
+
         Currency currency = AccountManager.getDefaultCurrency();
 
         if(user.deposit(currency, amount)){
