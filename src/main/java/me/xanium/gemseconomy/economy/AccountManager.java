@@ -71,7 +71,7 @@ public class AccountManager {
     }
 
     public static Account getAccount(UUID uuid) {
-        for (Account account : AccountManager.getAccounts()) {
+        for (Account account : AccountManager.getAccounts()) { // This throws concurrentmodificationexception randomly, might have to look into this
             if (!account.getUuid().equals(uuid)) continue;
             return account;
         }
