@@ -10,7 +10,6 @@ package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
-import me.xanium.gemseconomy.account.AccountManager;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.ChatColor;
@@ -151,7 +150,7 @@ public class SQLiteDataStore extends DataStore {
                 currency.setPayable(payable);
                 currency.setColor(color);
                 currency.setExchangeRate(exchangeRate);
-                AccountManager.getCurrencies().add(currency);
+                plugin.getCurrencyManager().add(currency);
                 UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }
         } catch (SQLException e) {
@@ -269,7 +268,7 @@ public class SQLiteDataStore extends DataStore {
             stmt.setString(1, account.getUuid().toString());
             ResultSet set = stmt.executeQuery();
             while (set.next()) {
-                Currency currency = AccountManager.getCurrency(UUID.fromString(set.getString("currency_id")));
+                Currency currency = plugin.getCurrencyManager().getCurrency(UUID.fromString(set.getString("currency_id")));
                 if (currency == null) {
                     continue;
                 }
@@ -358,7 +357,7 @@ public class SQLiteDataStore extends DataStore {
                 stmt.execute();
             }
             rs.close();
-            for (Currency currency : AccountManager.getCurrencies()) {
+            for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                 double balance = currency.getDefaultBalance();
                 stmt = this.getConnection().prepareStatement("SELECT * FROM " + this.getTablePrefix() + "_balances WHERE account_id = ? AND currency_id = ? LIMIT 1");
                 stmt.setString(1, account.getUuid().toString());
@@ -401,7 +400,7 @@ public class SQLiteDataStore extends DataStore {
                 stmt.execute();
             }
             rs.close();
-            for (Currency currency : AccountManager.getCurrencies()) {
+            for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                 double balance = account.getBalance(currency.getPlural());
                 if (balance == -100) {
                     balance = currency.getDefaultBalance();

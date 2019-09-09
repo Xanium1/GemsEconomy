@@ -8,7 +8,6 @@
 package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.account.Account;
-import me.xanium.gemseconomy.account.AccountManager;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.ChatColor;
@@ -74,7 +73,7 @@ public class YamlStorage extends DataStore {
                 currency.setPayable(getConfig().getBoolean(path + ".payable"));
                 currency.setSymbol(getConfig().getString(path + ".symbol"));
                 currency.setExchangeRate(getConfig().getDouble(path + ".exchange_rate"));
-                AccountManager.getCurrencies().add(currency);
+                plugin.getCurrencyManager().add(currency);
                 UtilServer.consoleLog("Loaded currency: " + currency.getSingular());
             }
         }
@@ -124,7 +123,7 @@ public class YamlStorage extends DataStore {
                 for (String currency : balances) {
                     String path2 = path + ".balances." + currency;
                     double balance = getConfig().getDouble(path2);
-                    Currency c = AccountManager.getCurrency(UUID.fromString(currency));
+                    Currency c = plugin.getCurrencyManager().getCurrency(UUID.fromString(currency));
                     if (c != null) {
                         account.modifyBalance(c, balance, false);
                     }
@@ -158,9 +157,7 @@ public class YamlStorage extends DataStore {
                         Account account = new Account(UUID.fromString(uuid), nick);
                         account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
                         loadBalances(account);
-                        if(!AccountManager.getAccounts().contains(account)){
-                            AccountManager.getAccounts().add(account);
-                        }
+                        plugin.getAccountManager().add(account);
                         return account;
                     }
                 }
@@ -180,9 +177,7 @@ public class YamlStorage extends DataStore {
             Account account = new Account(uuid, nick);
             account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
             loadBalances(account);
-            if(!AccountManager.getAccounts().contains(account)){
-                AccountManager.getAccounts().add(account);
-            }
+            plugin.getAccountManager().add(account);
             return account;
         }
         return null;
