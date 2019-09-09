@@ -18,20 +18,6 @@ public class NMSVersion {
 
     public static final String UNSUPPORTED = "Unsupported";
 
-    public static final String V1_7_R1 = "v1_7_R1";
-
-    public static final String V1_7_R2 = "v1_7_R2";
-
-    public static final String V1_7_R3 = "v1_7_R3";
-
-    public static final String V1_7_R4 = "v1_7_R4";
-
-    public static final String V1_8_R1 = "v1_8_R1";
-
-    public static final String V1_8_R2 = "v1_8_R2";
-
-    public static final String V1_8_R3 = "v1_8_R3";
-
     public static final String V1_9_R1 = "v1_9_R1";
 
     public static final String V1_9_R2 = "v1_9_R2";
@@ -84,13 +70,6 @@ public class NMSVersion {
 
     private void loadVersions() {
         registerVersion(UNSUPPORTED);
-        registerVersion(V1_7_R1);
-        registerVersion(V1_7_R2);
-        registerVersion(V1_7_R3);
-        registerVersion(V1_7_R4);
-        registerVersion(V1_8_R1);
-        registerVersion(V1_8_R2);
-        registerVersion(V1_8_R3);
         registerVersion(V1_9_R1);
         registerVersion(V1_9_R2);
         registerVersion(V1_10_R1);
@@ -107,11 +86,6 @@ public class NMSVersion {
 
     public String getVersionString() {
         return this.getVersionString(this.versionID);
-    }
-
-    public boolean isLegacy() {
-        return this.getVersionString().equals("v1_8_R1") || this.getVersionString().equals("v1_8_R2") || this.getVersionString().equals("v1_8_R3") || this.getVersionString().equals("v1_7_R1")
-                || this.getVersionString().equals("v1_7_R2")||this.getVersionString().equals("v1_7_R3") || this.getVersionString().equals("v1_7_R4");
     }
 
     public String getVersionString(int id) {

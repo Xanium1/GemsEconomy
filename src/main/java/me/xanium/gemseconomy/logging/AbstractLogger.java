@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public abstract class AbstractLogger implements ILogger {
+public abstract class AbstractLogger {
 
     private final GemsEconomy plugin;
     private final File folder;
@@ -43,22 +43,18 @@ public abstract class AbstractLogger implements ILogger {
         this.zipping = false;
     }
 
-    @Override
     public void save() {
         zipAndReplace();
     }
 
-    @Override
     public File getLatest() {
         return latest;
     }
 
-    @Override
     public File getFolder() {
         return folder;
     }
 
-    @Override
     public void zipAndReplace() {
         zipping = true;
 
@@ -101,7 +97,6 @@ public abstract class AbstractLogger implements ILogger {
         });
     }
 
-    @Override
     public void log(String message) {
         try {
             StringBuilder builder = new StringBuilder();
@@ -114,7 +109,6 @@ public abstract class AbstractLogger implements ILogger {
         }
     }
 
-    @Override
     public void warn(String message) {
         try {
             StringBuilder builder = new StringBuilder();
@@ -127,7 +121,6 @@ public abstract class AbstractLogger implements ILogger {
         }
     }
 
-    @Override
     public void error(String message, Exception ex) {
         try {
             StringBuilder builder = new StringBuilder();
@@ -158,7 +151,6 @@ public abstract class AbstractLogger implements ILogger {
         writer.close();
     }
 
-    @Override
     public String getDateAndTime() {
         return UtilTime.now();
     }

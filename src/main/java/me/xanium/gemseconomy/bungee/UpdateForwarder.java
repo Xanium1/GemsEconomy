@@ -5,8 +5,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,7 +26,12 @@ public class UpdateForwarder implements PluginMessageListener {
      * and currencies on all of the servers.
      */
 
+    private GemsEconomy plugin;
     private final String channelName = "GemsEconomy Data Channel";
+
+    public UpdateForwarder(GemsEconomy plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void onPluginMessageReceived(String channel, Player notInUse, byte[] message) {
@@ -41,15 +45,15 @@ public class UpdateForwarder implements PluginMessageListener {
             String[] info = in.readUTF().split(",");
             String type = info[0];
             String name = info[1];
-            if(GemsEconomy.getInstance().isDebug()){
+            if(plugin.isDebug()){
                 UtilServer.consoleLog(channelName + " - Received: " + type + " = " + name);
             }
 
             if(type.equals("currency")){
                 UUID uuid = UUID.fromString(name);
-                Currency currency = AccountManager.getCurrency(uuid);
+                Currency currency = plugin.getCurrencyManager().getCurrency(uuid);
                 if(currency != null) {
-                    GemsEconomy.getDataStore().updateCurrency(currency);
+                    plugin.getDataStore().updateCurrencyLocally(currency);
                     if(GemsEconomy.getInstance().isDebug()){
                         UtilServer.consoleLog(channelName + " - Currency " + name + " updated.");
                     }
@@ -57,9 +61,9 @@ public class UpdateForwarder implements PluginMessageListener {
             }
             else if(type.equals("account")){
                 UUID uuid = UUID.fromString(name);
-                AccountManager.removeAccount(uuid);
-                GemsEconomy.doAsync(() -> GemsEconomy.getDataStore().loadAccount(uuid));
-                if(GemsEconomy.getInstance().isDebug()){
+                plugin.getAccountManager().removeAccount(uuid);
+                GemsEconomy.doAsync(() -> plugin.getDataStore().loadAccount(uuid));
+                if(plugin.isDebug()){
                     UtilServer.consoleLog(channelName + " - Account " + name + " updated.");
                 }
             }

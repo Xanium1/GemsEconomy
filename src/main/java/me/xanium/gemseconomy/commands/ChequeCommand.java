@@ -9,9 +9,8 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.nbt.NBTItem;
 import me.xanium.gemseconomy.utils.UtilString;
@@ -44,7 +43,7 @@ public class ChequeCommand implements CommandExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("redeem")) {
 
-                if (player.getInventory().getItemInMainHand() != null && player.getInventory().getItemInMainHand().getType().equals(Material.valueOf(plugin.getConfig().getString("cheque.material")))) {
+                if (player.getInventory().getItemInMainHand().getType().equals(Material.valueOf(plugin.getConfig().getString("cheque.material")))) {
 
                     NBTItem item = new NBTItem(player.getInventory().getItemInMainHand());
                     if (item.getItem().getItemMeta().hasDisplayName() && item.getItem().getItemMeta().hasLore() && item.hasKey("value") && item.hasKey("currency")) {
@@ -57,7 +56,7 @@ public class ChequeCommand implements CommandExecutor {
                                 if (item.getItem().getAmount() > 1) {
                                     player.getInventory().getItemInMainHand().setAmount(player.getInventory().getItemInMainHand().getAmount() - 1);
 
-                                    Account user = AccountManager.getAccount(player);
+                                    Account user = plugin.getAccountManager().getAccount(player);
                                     Currency currency = plugin.getChequeManager().getCurrency(item);
                                     user.deposit(currency, value);
                                     player.sendMessage(F.getChequeRedeemed());
@@ -65,7 +64,7 @@ public class ChequeCommand implements CommandExecutor {
                                 } else {
 
                                     player.getInventory().remove(item.getItem());
-                                    Account user = AccountManager.getAccount(player);
+                                    Account user = plugin.getAccountManager().getAccount(player);
                                     Currency currency = plugin.getChequeManager().getCurrency(item);
                                     user.deposit(currency, value);
                                     player.sendMessage(F.getChequeRedeemed());
@@ -93,13 +92,13 @@ public class ChequeCommand implements CommandExecutor {
 
                 if (UtilString.validateInput(sender, args[1])) {
 
-                    double amount = Double.valueOf(args[1]);
+                    double amount = Double.parseDouble(args[1]);
                     if (amount != 0) {
 
                         if (args.length == 3) {
 
-                            Currency currency = AccountManager.getCurrency(args[2]);
-                            Account user = AccountManager.getAccount(player);
+                            Currency currency = plugin.getCurrencyManager().getCurrency(args[2]);
+                            Account user = plugin.getAccountManager().getAccount(player);
                             if (currency != null) {
                                 if(user.hasEnough(currency, amount)) {
 
@@ -108,21 +107,22 @@ public class ChequeCommand implements CommandExecutor {
                                     player.sendMessage(F.getChequeSucess());
                                     return true;
                                 }else{
-                                    player.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", currency.getColor()+"").replace("{currency}", currency.getPlural()));
+                                    player.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", currency.getColor()+"").replace("{currency}", currency.getSingular()));
                                 }
                             } else {
                                 player.sendMessage(F.getUnknownCurrency());
                             }
                         }
 
-                        Account user = AccountManager.getAccount(player);
+                        Currency defaultCurrency = plugin.getCurrencyManager().getDefaultCurrency();
+                        Account user = plugin.getAccountManager().getAccount(player);
                         if(user.hasEnough(amount)) {
-                            user.withdraw(AccountManager.getDefaultCurrency(), amount);
-                            player.getInventory().addItem(plugin.getChequeManager().write(player.getName(), AccountManager.getDefaultCurrency(), amount));
+                            user.withdraw(plugin.getCurrencyManager().getDefaultCurrency(), amount);
+                            player.getInventory().addItem(plugin.getChequeManager().write(player.getName(), plugin.getCurrencyManager().getDefaultCurrency(), amount));
                             player.sendMessage(F.getChequeSucess());
                             return true;
                         }else{
-                            player.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", AccountManager.getDefaultCurrency().getColor()+"").replace("{currency}", AccountManager.getDefaultCurrency().getPlural()));
+                            player.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", defaultCurrency.getColor()+"").replace("{currency}", defaultCurrency.getSingular()));
                         }
                     } else {
                         player.sendMessage(F.getUnvalidAmount());

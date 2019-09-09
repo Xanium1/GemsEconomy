@@ -9,9 +9,8 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,20 +31,21 @@ public class BalanceCommand implements CommandExecutor {
             }
             Account account;
             if (args.length == 0 && sender instanceof Player) {
-                account = AccountManager.getAccount((Player) sender);
+                account = plugin.getAccountManager().getAccount((Player) sender);
             }
             else if (sender.hasPermission("gemseconomy.command.balance.other") && args.length == 1) {
-                account = AccountManager.getAccount(args[0]);
+                account = plugin.getAccountManager().getAccount(args[0]);
             }else{
                 sender.sendMessage(F.getNoPerms());
                 return;
             }
             if (account != null) {
-                if (AccountManager.getCurrencies().size() == 0) {
-                    sender.sendMessage(F.getNoDefaultCurrency());
+                int currencies = plugin.getCurrencyManager().getCurrencies().size();
 
-                } else if (AccountManager.getCurrencies().size() == 1) {
-                    Currency currency = AccountManager.getDefaultCurrency();
+                if (currencies == 0) {
+                    sender.sendMessage(F.getNoDefaultCurrency());
+                } else if (currencies == 1) {
+                    Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
                     if (currency == null) {
                         sender.sendMessage(F.getBalanceNone().replace("{player}", account.getNickname()));
                         return;
@@ -54,7 +54,7 @@ public class BalanceCommand implements CommandExecutor {
                     sender.sendMessage(F.getBalance().replace("{player}", account.getDisplayName()).replace("{currencycolor}", ""+currency.getColor()).replace("{balance}", currency.format(balance)));
                 } else {
                     sender.sendMessage(F.getBalanceMultiple().replace("{player}", account.getDisplayName()));
-                    for (Currency currency : AccountManager.getCurrencies()) {
+                    for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                         double balance = account.getBalance(currency);
                         sender.sendMessage(F.getBalanceList().replace("{currencycolor}", currency.getColor()+"").replace("{format}", currency.format(balance)));
                     }

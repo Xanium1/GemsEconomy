@@ -9,9 +9,8 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.event.GemsPayEvent;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.Bukkit;
@@ -39,14 +38,14 @@ public class PayCommand implements CommandExecutor {
                 sender.sendMessage(F.getPayUsage());
                 return;
             }
-            if(AccountManager.getDefaultCurrency() == null){
+            if(plugin.getCurrencyManager().getDefaultCurrency() == null){
                 sender.sendMessage(F.getNoDefaultCurrency());
                 return;
             }
 
-            Currency currency = AccountManager.getDefaultCurrency();
+            Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
             if (args.length == 3) {
-                currency = AccountManager.getCurrency(args[2]);
+                currency = plugin.getCurrencyManager().getCurrency(args[2]);
             }
             if (currency != null) {
                 double amount;
@@ -80,12 +79,12 @@ public class PayCommand implements CommandExecutor {
                         return;
                     }
                 }
-                Account account = AccountManager.getAccount((Player) sender);
+                Account account = plugin.getAccountManager().getAccount((Player) sender);
                 if (account != null) {
-                    Account target = AccountManager.getAccount(args[0]);
+                    Account target = plugin.getAccountManager().getAccount(args[0]);
                     if (target != null) {
                         if (target.getUuid() != account.getUuid()) {
-                            if (target.isCanReceiveCurrency()) {
+                            if (target.canReceiveCurrency()) {
                                 if (account.hasEnough(currency, amount)) {
                                     GemsPayEvent event = new GemsPayEvent(currency, account, target, amount);
                                     GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));

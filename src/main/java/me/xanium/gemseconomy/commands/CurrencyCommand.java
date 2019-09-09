@@ -21,10 +21,9 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.data.DataStore;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
 import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.utils.UtilServer;
 import me.xanium.gemseconomy.utils.UtilString;
@@ -37,7 +36,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class CurrencyCommand implements CommandExecutor {
 
@@ -58,29 +56,24 @@ public class CurrencyCommand implements CommandExecutor {
                     if (args.length == 3) {
                         String single = args[1];
                         String plural = args[2];
-                        if (AccountManager.getCurrency(single) == null && AccountManager.getCurrency(plural) == null) {
-                            Currency currency = new Currency(UUID.randomUUID(), single, plural);
-                            sender.sendMessage(F.getPrefix() + "§7Created currency: §a" + currency.getPlural());
-                            AccountManager.getCurrencies().add(currency);
-                            if (AccountManager.getCurrencies().size() == 1) {
-                                currency.setDefaultCurrency(true);
-                            }
-                            currency.setExchangeRate(1.0);
-                            GemsEconomy.getDataStore().saveCurrency(currency);
-                        } else {
+                        if(plugin.getCurrencyManager().currencyExist(single) || plugin.getCurrencyManager().currencyExist(plural)){
                             sender.sendMessage(F.getPrefix() + "§cCurrency already exists.");
+                            return;
                         }
+                        
+                        plugin.getCurrencyManager().createNewCurrency(single, plural);
+                        sender.sendMessage(F.getPrefix() + "§7Created currency: §a" + single);
                     } else {
                         sender.sendMessage(F.getCurrencyUsage_Create());
                     }
                 } else if (cmd.equalsIgnoreCase("list")) {
-                    sender.sendMessage(F.getPrefix() + "§7There are §f" + AccountManager.getCurrencies().size() + "§7 currencies.");
-                    for (Currency currency : AccountManager.getCurrencies()) {
+                    sender.sendMessage(F.getPrefix() + "§7There are §f" + plugin.getCurrencyManager().getCurrencies().size() + "§7 currencies.");
+                    for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                         sender.sendMessage("§a§l>> §e" + currency.getSingular());
                     }
                 } else if (cmd.equalsIgnoreCase("view")) {
                     if (args.length == 2) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             sender.sendMessage(F.getPrefix() + "§7ID: §c" + currency.getUuid().toString());
                             sender.sendMessage(F.getPrefix() + "§7Singular: §a" + currency.getSingular() + "§7, Plural: §a" + currency.getPlural());
@@ -98,7 +91,7 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("startbal")) {
                     if (args.length == 3) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             double amount;
                             block76:
@@ -127,7 +120,7 @@ public class CurrencyCommand implements CommandExecutor {
                             }
                             currency.setDefaultBalance(amount);
                             sender.sendMessage(F.getPrefix() + "§7Starting balance for §f" + currency.getPlural() + " §7set: §a" + UtilString.format(currency.getDefaultBalance()));
-                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            plugin.getDataStore().saveCurrency(currency);
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
                         }
@@ -136,7 +129,7 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("color")) {
                     if (args.length == 3) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             try {
                                 ChatColor color = ChatColor.valueOf(args[2].toUpperCase());
@@ -145,7 +138,7 @@ public class CurrencyCommand implements CommandExecutor {
                                 }
                                 currency.setColor(color);
                                 sender.sendMessage(F.getPrefix() + "§7Color for §f" + currency.getPlural() + " §7updated: " + color + color.name());
-                                GemsEconomy.getDataStore().saveCurrency(currency);
+                                plugin.getDataStore().saveCurrency(currency);
                             } catch (Exception ex) {
                                 sender.sendMessage(F.getPrefix() + "§cInvalid chat color.");
                             }
@@ -174,17 +167,17 @@ public class CurrencyCommand implements CommandExecutor {
                     sender.sendMessage("§f§lWHITE §7= white|reset");
                 } else if (cmd.equalsIgnoreCase("symbol")) {
                     if (args.length == 3) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             String symbol = args[2];
                             if (symbol.equalsIgnoreCase("remove")) {
                                 currency.setSymbol(null);
                                 sender.sendMessage(F.getPrefix() + "§7Currency symbol removed for §f" + currency.getPlural());
-                                GemsEconomy.getDataStore().saveCurrency(currency);
+                                plugin.getDataStore().saveCurrency(currency);
                             } else if (symbol.length() == 1) {
                                 currency.setSymbol(symbol);
                                 sender.sendMessage(F.getPrefix() + "§7Currency symbol for §f" + currency.getPlural() + " §7updated: §a" + symbol);
-                                GemsEconomy.getDataStore().saveCurrency(currency);
+                                plugin.getDataStore().saveCurrency(currency);
                             } else {
                                 sender.sendMessage(F.getPrefix() + "§7Symbol must be 1 character, or remove it with \"remove\".");
                             }
@@ -196,16 +189,16 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("default")) {
                     if (args.length == 2) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
-                            Currency c = AccountManager.getDefaultCurrency();
+                            Currency c = plugin.getCurrencyManager().getDefaultCurrency();
                             if (c != null) {
                                 c.setDefaultCurrency(false);
-                                GemsEconomy.getDataStore().saveCurrency(c);
+                                plugin.getDataStore().saveCurrency(c);
                             }
                             currency.setDefaultCurrency(true);
                             sender.sendMessage(F.getPrefix() + "§7Set default currency to §f" + currency.getPlural());
-                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            plugin.getDataStore().saveCurrency(currency);
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
                         }
@@ -214,11 +207,11 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("payable")) {
                     if (args.length == 2) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             currency.setPayable(!currency.isPayable());
                             sender.sendMessage(F.getPrefix() + "§7Toggled payability for §f" + currency.getPlural() + "§7: " + (currency.isPayable() ? "§aYes" : "§cNo"));
-                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            plugin.getDataStore().saveCurrency(currency);
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
                         }
@@ -227,11 +220,11 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("decimals")) {
                     if (args.length == 2) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             currency.setDecimalSupported(!currency.isDecimalSupported());
                             sender.sendMessage(F.getPrefix() + "§7Toggled Decimal Support for §f" + currency.getPlural() + "§7: " + (currency.isDecimalSupported() ? "§aYes" : "§cNo"));
-                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            plugin.getDataStore().saveCurrency(currency);
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
                         }
@@ -240,11 +233,11 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("delete")) {
                     if (args.length == 2) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
-                            AccountManager.getAccounts().stream().filter(account -> account.getBalances().containsKey(currency)).forEach(account -> account.getBalances().remove(currency));
-                            GemsEconomy.getDataStore().deleteCurrency(currency);
-                            AccountManager.getCurrencies().remove(currency);
+                            plugin.getAccountManager().getAccounts().stream().filter(account -> account.getBalances().containsKey(currency)).forEach(account -> account.getBalances().remove(currency));
+                            plugin.getDataStore().deleteCurrency(currency);
+                            plugin.getCurrencyManager().getCurrencies().remove(currency);
                             sender.sendMessage(F.getPrefix() + "§7Deleted currency: §a" + currency.getPlural());
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
@@ -254,7 +247,7 @@ public class CurrencyCommand implements CommandExecutor {
                     }
                 } else if (cmd.equalsIgnoreCase("setrate")) {
                     if (args.length == 3) {
-                        Currency currency = AccountManager.getCurrency(args[1]);
+                        Currency currency = plugin.getCurrencyManager().getCurrency(args[1]);
                         if (currency != null) {
                             double amount;
 
@@ -268,7 +261,7 @@ public class CurrencyCommand implements CommandExecutor {
                                 return;
                             }
                             currency.setExchangeRate(amount);
-                            GemsEconomy.getDataStore().saveCurrency(currency);
+                            plugin.getDataStore().saveCurrency(currency);
                             sender.sendMessage(F.getExchangeRateSet().replace("{currencycolor}", "" + currency.getColor()).replace("{currency}", currency.getPlural()).replace("{amount}", String.valueOf(amount)));
                         } else {
                             sender.sendMessage(F.getUnknownCurrency());
@@ -279,7 +272,7 @@ public class CurrencyCommand implements CommandExecutor {
                 } else if (cmd.equalsIgnoreCase("convert")) {
                     if (args.length == 2) {
                         String method = args[1];
-                        DataStore current = GemsEconomy.getDataStore();
+                        DataStore current = plugin.getDataStore();
                         DataStore ds = DataStore.getMethod(method);
 
                         if (current == null) {
@@ -297,15 +290,15 @@ public class CurrencyCommand implements CommandExecutor {
                             plugin.saveConfig();
 
                             sender.sendMessage(F.getPrefix() + "§aLoading data..");
-                            AccountManager.getAccounts().clear();
+                            plugin.getAccountManager().getAccounts().clear();
 
-                            ArrayList<Account> offline = new ArrayList<>(GemsEconomy.getDataStore().getOfflineAccounts());
+                            ArrayList<Account> offline = new ArrayList<>(plugin.getDataStore().getOfflineAccounts());
                             sender.sendMessage(F.getPrefix() + "§aStored accounts.");
 
 
-                            ArrayList<Currency> currencies = new ArrayList<>(AccountManager.getCurrencies());
+                            ArrayList<Currency> currencies = new ArrayList<>(plugin.getCurrencyManager().getCurrencies());
                             sender.sendMessage(F.getPrefix() + "§aStored currencies.");
-                            AccountManager.getCurrencies().clear();
+                            plugin.getCurrencyManager().getCurrencies().clear();
 
                             if (plugin.isDebug()) {
                                 for (Account a : offline) {
@@ -328,8 +321,8 @@ public class CurrencyCommand implements CommandExecutor {
                                 });
                             }
 
-                            if (GemsEconomy.getDataStore() != null) {
-                                GemsEconomy.getDataStore().close();
+                            if (plugin.getDataStore() != null) {
+                                plugin.getDataStore().close();
 
                                 sender.sendMessage(F.getPrefix() + "§aDataStore is closed. Plugin is essentially dead now.");
                             }
@@ -344,7 +337,7 @@ public class CurrencyCommand implements CommandExecutor {
                             sender.sendMessage(F.getPrefix() + "§aInitialized " + ds.getName() + " Data Store. Check console for wrong username/password if using mysql.");
 
 
-                            if (GemsEconomy.getDataStore().getName() != null) {
+                            if (plugin.getDataStore().getName() != null) {
                                 for (Currency c : currencies) {
                                     Currency newCurrency = new Currency(c.getUuid(), c.getSingular(), c.getPlural());
                                     newCurrency.setExchangeRate(c.getExchangeRate());
@@ -354,10 +347,10 @@ public class CurrencyCommand implements CommandExecutor {
                                     newCurrency.setDecimalSupported(c.isDecimalSupported());
                                     newCurrency.setPayable(c.isPayable());
                                     newCurrency.setDefaultBalance(c.getDefaultBalance());
-                                    GemsEconomy.getDataStore().saveCurrency(newCurrency);
+                                    plugin.getDataStore().saveCurrency(newCurrency);
                                 }
                                 sender.sendMessage(F.getPrefix() + "§aSaved currencies to storage.");
-                                GemsEconomy.getDataStore().loadCurrencies();
+                                plugin.getDataStore().loadCurrencies();
                                 sender.sendMessage(F.getPrefix() + "§aLoaded all currencies as usual.");
 
                                 try {
@@ -367,7 +360,7 @@ public class CurrencyCommand implements CommandExecutor {
                                 }
 
                                 for (Account a : offline) {
-                                    GemsEconomy.getDataStore().saveAccount(a);
+                                    plugin.getDataStore().saveAccount(a);
                                 }
                                 sender.sendMessage(F.getPrefix() + "§aAll accounts saved to storage.");
 
@@ -378,7 +371,7 @@ public class CurrencyCommand implements CommandExecutor {
                                 }
 
                                 for (Player players : Bukkit.getOnlinePlayers()) {
-                                    GemsEconomy.getDataStore().loadAccount(players.getUniqueId());
+                                    plugin.getDataStore().loadAccount(players.getUniqueId());
                                 }
                                 sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
                             }
@@ -392,7 +385,7 @@ public class CurrencyCommand implements CommandExecutor {
                 } else if (cmd.equalsIgnoreCase("backend")) {
                     if(args.length == 2) {
                         String method = args[1];
-                        DataStore current = GemsEconomy.getDataStore();
+                        DataStore current = plugin.getDataStore();
                         DataStore ds = DataStore.getMethod(method);
 
                         if (current == null) {
@@ -412,11 +405,11 @@ public class CurrencyCommand implements CommandExecutor {
 
                             sender.sendMessage(F.getPrefix() + "§aSaving data and closing up...");
 
-                            if (GemsEconomy.getDataStore() != null) {
-                                GemsEconomy.getDataStore().close();
+                            if (plugin.getDataStore() != null) {
+                                plugin.getDataStore().close();
 
-                                AccountManager.getAccounts().clear();
-                                AccountManager.getCurrencies().clear();
+                                plugin.getAccountManager().getAccounts().clear();
+                                plugin.getCurrencyManager().getCurrencies().clear();
 
                                 sender.sendMessage(F.getPrefix() + "§aSuccessfully shutdown. Booting..");
                             }
@@ -431,7 +424,7 @@ public class CurrencyCommand implements CommandExecutor {
                             }
 
                             for (Player players : Bukkit.getOnlinePlayers()) {
-                                GemsEconomy.getDataStore().loadAccount(players.getUniqueId());
+                                plugin.getDataStore().loadAccount(players.getUniqueId());
                             }
                             sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
                         }

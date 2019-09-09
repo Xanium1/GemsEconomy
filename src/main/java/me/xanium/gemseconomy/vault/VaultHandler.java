@@ -9,7 +9,6 @@
 package me.xanium.gemseconomy.vault;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.AccountManager;
 import me.xanium.gemseconomy.utils.UtilServer;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -31,13 +30,15 @@ public class VaultHandler {
                 this.economy = new GEVaultHook();
             }
 
-            if(AccountManager.getDefaultCurrency() == null){
-                UtilServer.consoleLog("No Default currency found. Vault hook not enabling.");
+            if(plugin.getCurrencyManager().getDefaultCurrency() == null){
+                UtilServer.consoleLog("No Default currency found. Vault linking disabled!");
                 return;
             }
 
             ServicesManager sm = Bukkit.getServicesManager();
             sm.register(Economy.class, this.economy, plugin, ServicePriority.Highest);
+
+            UtilServer.consoleLog("Vault link enabled.");
         } catch (Exception e) {
             e.printStackTrace();
         }

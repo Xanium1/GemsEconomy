@@ -7,9 +7,9 @@
  */
 package me.xanium.gemseconomy.data;
 
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.account.AccountManager;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -197,7 +197,7 @@ public class YamlStorage extends DataStore {
             double balance = account.getBalance(currency);
             getConfig().set(path + ".balances." + currency.getUuid().toString(), balance);
         }
-        getConfig().set(path + ".payable", account.isCanReceiveCurrency());
+        getConfig().set(path + ".payable", account.canReceiveCurrency());
         try {
             getConfig().save(getFile());
         } catch (IOException e) {
@@ -217,7 +217,9 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public void updateCurrency(Currency currency) {}
+    public void updateCurrencyLocally(Currency currency) {
+        throw new UnsupportedOperationException("This method is not supported in SQLite.");
+    }
 
     public YamlConfiguration getConfig() {
         return configuration;

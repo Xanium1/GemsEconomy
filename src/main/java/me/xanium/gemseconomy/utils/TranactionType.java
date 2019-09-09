@@ -1,4 +1,4 @@
-package me.xanium.gemseconomy.economy;
+package me.xanium.gemseconomy.utils;
 
 public enum TranactionType {
 
@@ -10,5 +10,6 @@ public enum TranactionType {
      */
     DEPOSIT,
     WITHDRAW,
-    SET
+    SET,
+    CONVERSION
 }

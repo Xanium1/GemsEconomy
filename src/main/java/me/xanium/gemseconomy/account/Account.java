@@ -6,11 +6,13 @@
  * Thank you.
  */
 
-package me.xanium.gemseconomy.economy;
+package me.xanium.gemseconomy.account;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.event.GemsConversionEvent;
 import me.xanium.gemseconomy.event.GemsTransactionEvent;
+import me.xanium.gemseconomy.utils.TranactionType;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.Bukkit;
 
@@ -45,7 +47,7 @@ public class Account {
     }
 
     public boolean deposit(Currency currency, double amount) {
-        if (isCanReceiveCurrency()) {
+        if (canReceiveCurrency()) {
 
             GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.DEPOSIT);
             GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
@@ -69,7 +71,7 @@ public class Account {
             double added = getBalance(received) + amount;
             modifyBalance(exchanged, removed, false);
             modifyBalance(received, added, false);
-            GemsEconomy.getDataStore().saveAccount(this);
+            GemsEconomy.getInstance().getDataStore().saveAccount(this);
             GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Custom Amount] Account: " + getDisplayName() + " converted " + exchanged.format(exchangeAmount) + " to " + received.format(amount));
             return true;
         }
@@ -99,7 +101,7 @@ public class Account {
             if(hasEnough(exchanged, exchangeAmount)){
                 this.modifyBalance(exchanged, removed, false);
                 this.modifyBalance(received, added, false);
-                GemsEconomy.getDataStore().saveAccount(this);
+                GemsEconomy.getInstance().getDataStore().saveAccount(this);
                 GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
                 return true;
             }
@@ -120,7 +122,7 @@ public class Account {
         if(hasEnough(exchanged, finalAmount)){
             this.modifyBalance(exchanged, removed, false);
             this.modifyBalance(received, added, false);
-            GemsEconomy.getDataStore().saveAccount(this);
+            GemsEconomy.getInstance().getDataStore().saveAccount(this);
             GemsEconomy.getInstance().getEconomyLogger().log("[CONVERSION - Preset Rate] Account: " + getDisplayName() + " converted " + exchanged.format(removed) + " (Rate: " + rate + ") to " + received.format(added));
             return true;
         }
@@ -135,11 +137,14 @@ public class Account {
 
         getBalances().put(currency, amount);
         GemsEconomy.getInstance().getEconomyLogger().log("[BALANCE SET] Account: " + getDisplayName() + " were set to: " + currency.format(amount));
-        GemsEconomy.getDataStore().saveAccount(this);
+        GemsEconomy.getInstance().getDataStore().saveAccount(this);
     }
 
     /**
      * DO NOT USE UNLESS YOU HAVE VIEWED WHAT THIS DOES!
+     *
+     * This directly modifies the account balance for a currency, with the option of saving.
+     *
      * @param currency - Currency to modify
      * @param amount - Amount of cash to modify.
      * @param save - Save the account or not. Should be done async!
@@ -147,7 +152,7 @@ public class Account {
     public void modifyBalance(Currency currency, double amount, boolean save){
         getBalances().put(currency, amount);
         if(save){
-            GemsEconomy.getDataStore().saveAccount(this);
+            GemsEconomy.getInstance().getDataStore().saveAccount(this);
         }
     }
 
@@ -184,14 +189,14 @@ public class Account {
     }
 
     public boolean hasEnough(double amount){
-        return hasEnough(AccountManager.getDefaultCurrency(), amount);
+        return hasEnough(GemsEconomy.getInstance().getCurrencyManager().getDefaultCurrency(), amount);
     }
 
     public boolean hasEnough(Currency currency, double amount){
         return getBalance(currency) >= amount;
     }
 
-    public boolean isCanReceiveCurrency() {
+    public boolean canReceiveCurrency() {
         return canReceiveCurrency;
     }
 

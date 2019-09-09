@@ -9,8 +9,8 @@
 package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -49,7 +49,7 @@ public abstract class DataStore {
 
     public abstract void loadCurrencies();
 
-    public abstract void updateCurrency(Currency currency);
+    public abstract void updateCurrencyLocally(Currency currency);
 
     public abstract void saveCurrency(Currency currency);
 

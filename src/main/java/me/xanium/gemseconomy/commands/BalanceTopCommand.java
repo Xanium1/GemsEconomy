@@ -21,8 +21,7 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -43,14 +42,14 @@ public class BalanceTopCommand implements CommandExecutor {
                 sender.sendMessage(F.getNoPerms());
                 return;
             }
-            if (!GemsEconomy.getDataStore().isTopSupported()) {
-                sender.sendMessage(F.getBalanceTopNoSupport().replace("{storage}", GemsEconomy.getDataStore().getName()));
+            if (!plugin.getDataStore().isTopSupported()) {
+                sender.sendMessage(F.getBalanceTopNoSupport().replace("{storage}", plugin.getDataStore().getName()));
                 return;
             }
-            Currency currency = AccountManager.getDefaultCurrency();
+            Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
             int page = 1;
             if (args.length > 0) {
-                currency = AccountManager.getCurrency(args[0]);
+                currency = plugin.getCurrencyManager().getCurrency(args[0]);
                 if (args.length == 2) {
                     try {
                         page = Integer.parseInt(args[1]);
@@ -65,7 +64,7 @@ public class BalanceTopCommand implements CommandExecutor {
             }
             int offset = 10 * (page - 1);
             if (currency != null) {
-                Map<String, Double> toplist = GemsEconomy.getDataStore().getTopList(currency, offset, ACCOUNTS_PER_PAGE);
+                Map<String, Double> toplist = plugin.getDataStore().getTopList(currency, offset, ACCOUNTS_PER_PAGE);
                 sender.sendMessage(F.getBalanceTopHeader()
                         .replace("{currencycolor}", "" + currency.getColor())
                         .replace("{currencyplural}", currency.getPlural())

@@ -8,19 +8,18 @@
 
 package me.xanium.gemseconomy;
 
+import me.xanium.gemseconomy.account.AccountManager;
 import me.xanium.gemseconomy.bungee.UpdateForwarder;
+import me.xanium.gemseconomy.cheque.ChequeManager;
 import me.xanium.gemseconomy.commands.*;
+import me.xanium.gemseconomy.currency.CurrencyManager;
 import me.xanium.gemseconomy.data.DataStore;
 import me.xanium.gemseconomy.data.MySQLStorage;
 import me.xanium.gemseconomy.data.SQLiteDataStore;
 import me.xanium.gemseconomy.data.YamlStorage;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.ChequeManager;
 import me.xanium.gemseconomy.file.Configuration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
-import me.xanium.gemseconomy.logging.EcoLogger;
 import me.xanium.gemseconomy.logging.EconomyLogger;
-import me.xanium.gemseconomy.logging.ILogger;
 import me.xanium.gemseconomy.nbt.NMSVersion;
 import me.xanium.gemseconomy.utils.Metrics;
 import me.xanium.gemseconomy.utils.Updater;
@@ -33,13 +32,16 @@ import java.io.IOException;
 
 public class GemsEconomy extends JavaPlugin {
 
-    private static DataStore dataStore = null;
     private static GemsEconomy instance;
+
+    private DataStore dataStore = null;
+    private AccountManager accountManager;
     private ChequeManager chequeManager;
+    private CurrencyManager currencyManager;
     private VaultHandler vaultHandler;
     private NMSVersion nmsVersion;
     private Metrics metrics;
-    private ILogger economyLogger;
+    private EconomyLogger economyLogger;
     private UpdateForwarder updateForwarder;
 
     private boolean debug = false;
@@ -50,12 +52,9 @@ public class GemsEconomy extends JavaPlugin {
 
     /**
      * Changes:
-     * Fixed the Cache, I made a cache for accounts but didn't actually use it.
-     * So this would bring a performance boost regarding account lookups. (Data reading)
-     * Fixed a money dupe bug when a player joins first time, receives money and can pay infinite until they rejoin.
-     *
-     *
-     * Added support for 1.14!
+     * Cheque validation has been changed. Due to this, all current cheques on your server will no longer be valid.
+     * Boosted MySql Performance a bit!
+     * Done a lot of clean up in the code. A lot more readable now :D
      *
      * Please let me know if you find bugs!
      * PM me or contact me on discord!
@@ -65,12 +64,10 @@ public class GemsEconomy extends JavaPlugin {
 
     /**
      * Todo List:
-     *
-     *
      */
 
     @Override
-    public void onLoad(){
+    public void onLoad() {
         Configuration configuration = new Configuration(this);
         configuration.loadDefaultConfig();
 
@@ -80,14 +77,16 @@ public class GemsEconomy extends JavaPlugin {
     }
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         instance = this;
 
         nmsVersion = new NMSVersion();
+        accountManager = new AccountManager(this);
+        currencyManager = new CurrencyManager(this);
         chequeManager = new ChequeManager(this);
-        economyLogger = new EcoLogger(this);
+        economyLogger = new EconomyLogger(this);
         metrics = new Metrics(this);
-        updateForwarder = new UpdateForwarder();
+        updateForwarder = new UpdateForwarder(this);
 
         initializeDataStore(getConfig().getString("storage"), true);
 
@@ -100,33 +99,31 @@ public class GemsEconomy extends JavaPlugin {
         getCommand("cheque").setExecutor(new ChequeCommand());
         getCommand("exchange").setExecutor(new ExchangeCommand());
 
-        if(isVault()){
+        if (isVault()) {
             vaultHandler = new VaultHandler(this);
             vaultHandler.hook();
-            UtilServer.consoleLog("Vault compatibility enabled.");
-        }else{
-            UtilServer.consoleLog("Vault compatibility is disabled.");
+        } else {
+            UtilServer.consoleLog("Vault link is disabled.");
         }
 
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", updateForwarder);
 
-        if(isLogging()) {
+        if (isLogging()) {
             getEconomyLogger().save();
         }
 
-        doAsync(() -> checkForUpdate());
+        doAsync(this::checkForUpdate);
     }
 
     @Override
     public void onDisable() {
         disabling = true;
 
-        if(isVault()) getVaultHandler().unhook();
-        if(isLogging()) EconomyLogger.closeLog();
+        if (isVault()) getVaultHandler().unhook();
 
-        if (GemsEconomy.getDataStore() != null) {
-            GemsEconomy.getDataStore().close();
+        if (getDataStore() != null) {
+            getDataStore().close();
         }
     }
 
@@ -136,9 +133,9 @@ public class GemsEconomy extends JavaPlugin {
         DataStore.getMethods().add(new MySQLStorage(getConfig().getString("mysql.host"), getConfig().getInt("mysql.port"), getConfig().getString("mysql.database"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password")));
         DataStore.getMethods().add(new SQLiteDataStore(new File(getDataFolder(), getConfig().getString("sqlite.file"))));
 
-        if(strategy != null){
+        if (strategy != null) {
             dataStore = DataStore.getMethod(strategy);
-        }else{
+        } else {
             UtilServer.consoleLog("§cNo valid storage method provided.");
             UtilServer.consoleLog("§cCheck your files, then try again.");
             getServer().getPluginManager().disablePlugin(this);
@@ -149,10 +146,10 @@ public class GemsEconomy extends JavaPlugin {
             UtilServer.consoleLog("Initializing data store \"" + getDataStore().getName() + "\"...");
             getDataStore().initialize();
 
-            if(load) {
+            if (load) {
                 UtilServer.consoleLog("Loading currencies...");
                 getDataStore().loadCurrencies();
-                UtilServer.consoleLog("Loaded " + AccountManager.getCurrencies().size() + " currencies!");
+                UtilServer.consoleLog("Loaded " + getCurrencyManager().getCurrencies().size() + " currencies!");
             }
         } catch (Throwable e) {
             UtilServer.consoleLog("§cCannot load initial data from DataStore.");
@@ -174,27 +171,60 @@ public class GemsEconomy extends JavaPlugin {
             }
         } catch (IOException e) {
             UtilServer.consoleLog("Could not check for updates! Error log will follow if debug is enabled.");
-            if(isDebug()) {
+            if (isDebug()) {
                 UtilServer.consoleLog(e.getCause());
             }
         }
     }
 
-    public static void doAsync(Runnable runnable){
+    public static void doAsync(Runnable runnable) {
         getInstance().getServer().getScheduler().runTaskAsynchronously(getInstance(), runnable);
     }
 
-    public static void doSync(Runnable runnable){
+    public static void doSync(Runnable runnable) {
         getInstance().getServer().getScheduler().runTask(getInstance(), runnable);
     }
 
-    public static DataStore getDataStore() {
+    public DataStore getDataStore() {
         return dataStore;
     }
 
     public static GemsEconomy getInstance() {
         return instance;
     }
+
+    public CurrencyManager getCurrencyManager() {
+        return currencyManager;
+    }
+
+    public AccountManager getAccountManager() {
+        return accountManager;
+    }
+
+    public VaultHandler getVaultHandler() {
+        return vaultHandler;
+    }
+
+    public EconomyLogger getEconomyLogger() {
+        return economyLogger;
+    }
+
+    public NMSVersion getNmsVersion() {
+        return nmsVersion;
+    }
+
+    public Metrics getMetrics() {
+        return metrics;
+    }
+
+    public ChequeManager getChequeManager() {
+        return chequeManager;
+    }
+
+    public UpdateForwarder getUpdateForwarder() {
+        return updateForwarder;
+    }
+
 
     public boolean isDebug() {
         return debug;
@@ -220,31 +250,7 @@ public class GemsEconomy extends JavaPlugin {
         this.logging = logging;
     }
 
-    public VaultHandler getVaultHandler() {
-        return vaultHandler;
-    }
-
-    public ILogger getEconomyLogger() {
-        return economyLogger;
-    }
-
-    public NMSVersion getNmsVersion() {
-        return nmsVersion;
-    }
-
-    public Metrics getMetrics() {
-        return metrics;
-    }
-
-    public ChequeManager getChequeManager() {
-        return chequeManager;
-    }
-
     public boolean isDisabling() {
         return disabling;
-    }
-
-    public UpdateForwarder getUpdateForwarder() {
-        return updateForwarder;
     }
 }

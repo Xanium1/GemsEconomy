@@ -6,7 +6,7 @@
  * Thank you.
  */
 
-package me.xanium.gemseconomy.economy;
+package me.xanium.gemseconomy.currency;
 
 import me.xanium.gemseconomy.utils.UtilString;
 import org.bukkit.ChatColor;

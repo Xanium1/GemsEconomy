@@ -1,15 +1,16 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ExchangeCommand implements CommandExecutor {
+
+    private final GemsEconomy plugin = GemsEconomy.getInstance();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String v21315, String[] args) {
@@ -27,8 +28,8 @@ public class ExchangeCommand implements CommandExecutor {
                     sender.sendMessage(F.getExchangeNoPermPreset());
                     return;
                 }
-                Currency toExchange = AccountManager.getCurrency(args[0]);
-                Currency toReceive = AccountManager.getCurrency(args[2]);
+                Currency toExchange = plugin.getCurrencyManager().getCurrency(args[0]);
+                Currency toReceive = plugin.getCurrencyManager().getCurrency(args[2]);
                 double amount;
 
                 if (toExchange != null && toReceive != null) {
@@ -53,7 +54,7 @@ public class ExchangeCommand implements CommandExecutor {
                             return;
                         }
                     }
-                    Account account = AccountManager.getAccount(sender.getName());
+                    Account account = plugin.getAccountManager().getAccount(sender.getName());
                     if (account != null) {
                         if (account.convert(toExchange, amount, toReceive, -1)) {
                             sender.sendMessage(F.getExchangeSuccess()
@@ -72,8 +73,8 @@ public class ExchangeCommand implements CommandExecutor {
                     sender.sendMessage(F.getExchangeNoPermCustom());
                     return;
                 }
-                Currency toExchange = AccountManager.getCurrency(args[0]);
-                Currency toReceive = AccountManager.getCurrency(args[2]);
+                Currency toExchange = plugin.getCurrencyManager().getCurrency(args[0]);
+                Currency toReceive = plugin.getCurrencyManager().getCurrency(args[2]);
                 double toExchangeAmount = 0.0;
                 double toReceiveAmount = 0.0;
 
@@ -99,7 +100,7 @@ public class ExchangeCommand implements CommandExecutor {
                             sender.sendMessage(F.getUnvalidAmount());
                         }
                     }
-                    Account account = AccountManager.getAccount(sender.getName());
+                    Account account = plugin.getAccountManager().getAccount(sender.getName());
                     if (account != null) {
                         if (account.convert(toExchange, toExchangeAmount, toReceive, toReceiveAmount)) {
                             sender.sendMessage(F.getExchangeSuccessCustom()
@@ -117,13 +118,13 @@ public class ExchangeCommand implements CommandExecutor {
                     sender.sendMessage(F.getExchangeNoPermCustom());
                     return;
                 }
-                Account account = AccountManager.getAccount(args[0]);
+                Account account = plugin.getAccountManager().getAccount(args[0]);
                 if (account == null) {
                     sender.sendMessage(F.getPlayerDoesNotExist());
                     return;
                 }
-                Currency toExchange = AccountManager.getCurrency(args[1]);
-                Currency toReceive = AccountManager.getCurrency(args[3]);
+                Currency toExchange = plugin.getCurrencyManager().getCurrency(args[1]);
+                Currency toReceive = plugin.getCurrencyManager().getCurrency(args[3]);
                 double toExchangeAmount = 0.0;
                 double toReceiveAmount = 0.0;
 

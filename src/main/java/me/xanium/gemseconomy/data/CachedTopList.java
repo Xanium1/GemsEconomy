@@ -6,7 +6,9 @@
  * Thank you.
  */
 
-package me.xanium.gemseconomy.economy;
+package me.xanium.gemseconomy.data;
+
+import me.xanium.gemseconomy.currency.Currency;
 
 import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;

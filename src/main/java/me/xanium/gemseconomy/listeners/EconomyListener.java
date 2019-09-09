@@ -9,8 +9,7 @@
 package me.xanium.gemseconomy.listeners;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
+import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.file.F;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.entity.Player;
@@ -31,25 +30,22 @@ public class EconomyListener implements Listener {
         if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
 
         GemsEconomy.doAsync(() -> {
-            Account account = AccountManager.getAccount(player.getUniqueId());
+            Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
 
             if (account == null) {
                 account = new Account(player.getUniqueId(), player.getName());
 
-                if (!GemsEconomy.getDataStore().getName().equalsIgnoreCase("yaml")) {
-                    GemsEconomy.getDataStore().createAccount(account);
+                if (!plugin.getDataStore().getName().equalsIgnoreCase("yaml")) {
+                    plugin.getDataStore().createAccount(account);
                 } else {
-                    GemsEconomy.getDataStore().saveAccount(account);
-                    if(!AccountManager.getAccounts().contains(account)){
-                        AccountManager.getAccounts().add(account);
-                    }
+                    plugin.getDataStore().saveAccount(account);
+                    plugin.getAccountManager().add(account);
                 }
 
                 UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
-
             } else if (!account.getNickname().equals(player.getName()) || account.getNickname() == null) {
                 account.setNickname(player.getName());
-                GemsEconomy.getDataStore().saveAccount(account);
+                plugin.getDataStore().saveAccount(account);
                 UtilServer.consoleLog("Name change found! Updating account " + account.getDisplayName() + "...");
             }
         });
@@ -58,21 +54,21 @@ public class EconomyListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        AccountManager.removeAccount(player.getUniqueId());
+        plugin.getAccountManager().removeAccount(player.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         plugin.getServer().getScheduler().runTask(plugin, () -> {
-            Account account = AccountManager.getAccount(player);
-            if (account != null && !AccountManager.getAccounts().contains(account)) {
-                AccountManager.getAccounts().add(account);
+            Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
+            if (account != null) {
+                plugin.getAccountManager().add(account);
             }
         });
 
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (AccountManager.getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency"))) {
+            if (plugin.getCurrencyManager().getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency"))) {
                 player.sendMessage(F.getPrefix() + "§cYou have not made a currency yet. Please do so by \"§e/currency§c\".");
             }
         }, 60);

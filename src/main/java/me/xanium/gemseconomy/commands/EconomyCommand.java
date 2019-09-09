@@ -9,9 +9,8 @@
 package me.xanium.gemseconomy.commands;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -65,9 +64,9 @@ public class EconomyCommand implements CommandExecutor {
                     sender.sendMessage(F.getGiveUsage());
                     return;
                 }
-                Currency currency = AccountManager.getDefaultCurrency();
+                Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
                 if (args.length == 4) {
-                    currency = AccountManager.getCurrency(args[3]);
+                    currency = plugin.getCurrencyManager().getCurrency(args[3]);
                 }
                 if (currency != null) {
                     double amount;
@@ -93,7 +92,7 @@ public class EconomyCommand implements CommandExecutor {
                         }
                     }
 
-                    Account target = AccountManager.getAccount(args[1]);
+                    Account target = plugin.getAccountManager().getAccount(args[1]);
                     if (target != null) {
                         if (target.deposit(currency, amount)) {
                             sender.sendMessage(F.getAddMessage()
@@ -112,9 +111,9 @@ public class EconomyCommand implements CommandExecutor {
                     sender.sendMessage(F.getTakeUsage());
                     return;
                 }
-                Currency currency = AccountManager.getDefaultCurrency();
+                Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
                 if (args.length == 4) {
-                    currency = AccountManager.getCurrency(args[3]);
+                    currency = plugin.getCurrencyManager().getCurrency(args[3]);
                 }
                 if (currency != null) {
                     double amount;
@@ -140,7 +139,7 @@ public class EconomyCommand implements CommandExecutor {
                             return;
                         }
                     }
-                    Account target = AccountManager.getAccount(args[1]);
+                    Account target = plugin.getAccountManager().getAccount(args[1]);
                     if (target != null) {
                         if (target.withdraw(currency, amount)) {
                             sender.sendMessage(F.getTakeMessage()
@@ -169,9 +168,9 @@ public class EconomyCommand implements CommandExecutor {
                 sender.sendMessage(F.getSetUsage());
                 return;
             }
-            Currency currency = AccountManager.getDefaultCurrency();
+            Currency currency = plugin.getCurrencyManager().getDefaultCurrency();
             if (args.length == 4) {
-                currency = AccountManager.getCurrency(args[3]);
+                currency = plugin.getCurrencyManager().getCurrency(args[3]);
             }
             if (currency != null) {
                 double amount;
@@ -190,7 +189,7 @@ public class EconomyCommand implements CommandExecutor {
                         return;
                     }
                 }
-                Account target = AccountManager.getAccount(args[1]);
+                Account target = plugin.getAccountManager().getAccount(args[1]);
                 if (target != null) {
                     target.setBalance(currency, amount);
                     sender.sendMessage(F.getSetMessage()

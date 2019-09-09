@@ -6,9 +6,10 @@
  * Thank you.
  */
 
-package me.xanium.gemseconomy.economy;
+package me.xanium.gemseconomy.cheque;
 
 import me.xanium.gemseconomy.GemsEconomy;
+import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.nbt.NBTItem;
 import me.xanium.gemseconomy.utils.UtilString;
 import org.bukkit.Material;
@@ -17,11 +18,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ChequeManager {
 
     private final GemsEconomy plugin;
     private final ItemStack chequeBaseItem;
+    private String nbt_issuer = "issuer";
     private String nbt_value = "value";
     private String nbt_currency = "currency";
 
@@ -42,7 +45,7 @@ public class ChequeManager {
         }
         List<String> formatLore = new ArrayList<>();
 
-        for (String baseLore2 : chequeBaseItem.getItemMeta().getLore()) {
+        for (String baseLore2 : Objects.requireNonNull(chequeBaseItem.getItemMeta().getLore())) {
             formatLore.add(baseLore2.replace("{value}", currency.format(amount)).replace("{player}", creatorName));
         }
         ItemStack ret = chequeBaseItem.clone();
@@ -50,18 +53,26 @@ public class ChequeManager {
         ItemMeta meta = nbt.getItem().getItemMeta();
         meta.setLore(formatLore);
         nbt.getItem().setItemMeta(meta);
+        nbt.setString(nbt_issuer, creatorName);
         nbt.setString(nbt_currency, currency.getPlural());
         nbt.setString(nbt_value, String.valueOf(amount));
         return nbt.getItem();
     }
 
     public boolean isValid(NBTItem itemstack) {
-        if (itemstack.getItem().getType() == chequeBaseItem.getType() && itemstack.getString(nbt_value) != null && itemstack.getString(nbt_currency) != null && itemstack.getItem().getItemMeta().hasLore()) {
+        if(itemstack.getItem().getType() != chequeBaseItem.getType())return false;
+        if (itemstack.getString(nbt_value) != null && itemstack.getString(nbt_currency) != null && itemstack.getString(nbt_issuer) != null) {
+
             String display = chequeBaseItem.getItemMeta().getDisplayName();
-            if (itemstack.getItem().getItemMeta().getDisplayName().equals(display) && itemstack.getItem().getItemMeta().hasLore()) {
-                return (itemstack.getItem().getItemMeta().getDisplayName().equals(display) && itemstack.getItem().getItemMeta().getLore().size() == chequeBaseItem.getItemMeta().getLore().size());
+            ItemMeta meta = itemstack.getItem().getItemMeta();
+
+            if(meta == null) return false;
+
+            if(meta.hasDisplayName() && meta.getDisplayName().equals(display)){
+                if(meta.hasLore() && meta.getLore().size() == chequeBaseItem.getItemMeta().getLore().size()){
+                    return true;
+                }
             }
-            return false;
         }
         return false;
     }
@@ -80,8 +91,8 @@ public class ChequeManager {
      */
     public Currency getCurrency(NBTItem item) {
         if (item.getString(nbt_currency) != null && item.getString(nbt_value) != null) {
-            return AccountManager.getCurrency(item.getString(nbt_currency));
+            return plugin.getCurrencyManager().getCurrency(item.getString(nbt_currency));
         }
-        return AccountManager.getDefaultCurrency();
+        return plugin.getCurrencyManager().getDefaultCurrency();
     }
 }

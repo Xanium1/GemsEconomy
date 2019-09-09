@@ -9,16 +9,17 @@
 package me.xanium.gemseconomy.api;
 
 import me.xanium.gemseconomy.GemsEconomy;
-import me.xanium.gemseconomy.economy.Account;
-import me.xanium.gemseconomy.economy.AccountManager;
-import me.xanium.gemseconomy.economy.Currency;
+import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.Currency;
 
 import java.util.UUID;
 
 public class GemsEconomyAPI {
 
+    public final GemsEconomy plugin = GemsEconomy.getInstance();
+
     public GemsEconomyAPI(){
-        if(AccountManager.getDefaultCurrency() == null){
+        if(plugin.getCurrencyManager().getDefaultCurrency() == null){
             GemsEconomy.getInstance().getLogger().warning("||");
             GemsEconomy.getInstance().getLogger().warning("||");
             GemsEconomy.getInstance().getLogger().warning("||");
@@ -36,8 +37,8 @@ public class GemsEconomyAPI {
      * @param amount - An amount of the default currency.
      */
     public void deposit(UUID uuid, double amount){
-        Account acc = AccountManager.getAccount(uuid);
-        acc.deposit(AccountManager.getDefaultCurrency(), amount);
+        Account acc = plugin.getAccountManager().getAccount(uuid);
+        acc.deposit(plugin.getCurrencyManager().getDefaultCurrency(), amount);
     }
 
     /**
@@ -47,11 +48,11 @@ public class GemsEconomyAPI {
      * @param currency - A specified currency.
      */
     public void deposit(UUID uuid, double amount, Currency currency){
-        Account acc = AccountManager.getAccount(uuid);
+        Account acc = plugin.getAccountManager().getAccount(uuid);
         if(currency != null) {
             acc.deposit(currency, amount);
         }else{
-            acc.deposit(AccountManager.getDefaultCurrency(), amount);
+            acc.deposit(plugin.getCurrencyManager().getDefaultCurrency(), amount);
         }
     }
 
@@ -61,8 +62,8 @@ public class GemsEconomyAPI {
      * @param amount - An amount of the default currency.
      */
     public void withdraw(UUID uuid, double amount){
-        Account acc = AccountManager.getAccount(uuid);
-        acc.withdraw(AccountManager.getDefaultCurrency(), amount);
+        Account acc = plugin.getAccountManager().getAccount(uuid);
+        acc.withdraw(plugin.getCurrencyManager().getDefaultCurrency(), amount);
     }
 
     /**
@@ -72,11 +73,11 @@ public class GemsEconomyAPI {
      * @param currency - The currency you withdraw from.
      */
     public void withdraw(UUID uuid, double amount, Currency currency){
-        Account acc = AccountManager.getAccount(uuid);
+        Account acc = plugin.getAccountManager().getAccount(uuid);
         if(currency != null) {
             acc.withdraw(currency, amount);
         }else{
-            acc.withdraw(AccountManager.getDefaultCurrency(), amount);
+            acc.withdraw(plugin.getCurrencyManager().getDefaultCurrency(), amount);
         }
     }
 
@@ -86,8 +87,8 @@ public class GemsEconomyAPI {
      * @return - The default currency balance of the user.
      */
     public double getBalance(UUID uuid){
-        Account acc = AccountManager.getAccount(uuid);
-        return acc.getBalance(AccountManager.getDefaultCurrency());
+        Account acc = plugin.getAccountManager().getAccount(uuid);
+        return acc.getBalance(plugin.getCurrencyManager().getDefaultCurrency());
     }
 
     /**
@@ -97,11 +98,11 @@ public class GemsEconomyAPI {
      * @return - The balance of the specified currency.
      */
     public double getBalance(UUID uuid, Currency currency) {
-        Account acc = AccountManager.getAccount(uuid);
+        Account acc = plugin.getAccountManager().getAccount(uuid);
         if (currency != null) {
             return acc.getBalance(currency);
         }else{
-            return acc.getBalance(AccountManager.getDefaultCurrency());
+            return acc.getBalance(plugin.getCurrencyManager().getDefaultCurrency());
         }
     }
 
@@ -111,8 +112,8 @@ public class GemsEconomyAPI {
      * @return - Currency Object.
      */
     public Currency getCurrency(String name){
-        if(AccountManager.getCurrency(name) != null){
-            return AccountManager.getCurrency(name);
+        if(plugin.getCurrencyManager().getCurrency(name) != null){
+            return plugin.getCurrencyManager().getCurrency(name);
         }
         return null;
     }
