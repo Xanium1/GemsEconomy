@@ -40,6 +40,9 @@ public class ChequeManager {
     }
 
     public ItemStack write(String creatorName, Currency currency, double amount) {
+        if(!currency.isPayable())return null;
+
+
         if (creatorName.equals("CONSOLE")) {
             creatorName = UtilString.colorize(plugin.getConfig().getString("cheque.console_name"));
         }
