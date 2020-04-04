@@ -64,6 +64,7 @@ public class GemsEconomy extends JavaPlugin {
 
     /**
      * Todo List:
+     * Add placeholder to get all the amount of money of a currency
      */
 
     @Override
