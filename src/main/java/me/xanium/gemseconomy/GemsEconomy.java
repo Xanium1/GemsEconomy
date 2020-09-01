@@ -55,6 +55,8 @@ public class GemsEconomy extends JavaPlugin {
      * Cheque validation has been changed. Due to this, all current cheques on your server will no longer be valid.
      * Boosted MySql Performance a bit!
      * Done a lot of clean up in the code. A lot more readable now :D
+     * Fixed a possible bug that you could pay yourself somehow?
+     * Added 1.16 support
      *
      * Please let me know if you find bugs!
      * PM me or contact me on discord!
