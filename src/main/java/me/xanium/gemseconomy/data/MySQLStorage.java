@@ -85,7 +85,6 @@ public class MySQLStorage extends DataStore {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
 

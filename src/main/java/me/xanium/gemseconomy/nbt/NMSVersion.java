@@ -36,6 +36,10 @@ public class NMSVersion {
 
     public static final String V1_15_R1 = "v1_15_R1";
 
+    public static final String V1_16_R1 = "v1_16_R1";
+
+    public static final String V1_16_R2 = "v1_16_R2";
+
     private Map<Integer, String> versionMap;
 
     private int versionID;
@@ -81,6 +85,8 @@ public class NMSVersion {
         registerVersion(V1_13_R2);
         registerVersion(V1_14_R1);
         registerVersion(V1_15_R1);
+        registerVersion(V1_16_R1);
+        registerVersion(V1_16_R2);
     }
 
     private void registerVersion(String string) {

@@ -83,7 +83,7 @@ public class PayCommand implements CommandExecutor {
                 if (account != null) {
                     Account target = plugin.getAccountManager().getAccount(args[0]);
                     if (target != null) {
-                        if (target.getUuid() != account.getUuid()) {
+                        if (!target.getUuid().equals(account.getUuid())) {
                             if (target.canReceiveCurrency()) {
                                 if (account.hasEnough(currency, amount)) {
                                     GemsPayEvent event = new GemsPayEvent(currency, account, target, amount);
