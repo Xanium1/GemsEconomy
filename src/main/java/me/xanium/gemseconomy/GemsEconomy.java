@@ -51,12 +51,12 @@ public class GemsEconomy extends JavaPlugin {
     private boolean disabling = false;
 
     /**
-     * Changes:
-     * Cheque validation has been changed. Due to this, all current cheques on your server will no longer be valid.
-     * Boosted MySql Performance a bit!
-     * Done a lot of clean up in the code. A lot more readable now :D
-     * Fixed a possible bug that you could pay yourself somehow?
-     * Added 1.16 support
+     * Supports 1.16.4 now!
+     * Bugs fixed:
+     * The first currency you create was not set to default. This is now fixed
+     *
+     * HikariCP updated to 3.4.5
+     * PlaceholderAPI expansion is also fixed!
      *
      * Please let me know if you find bugs!
      * PM me or contact me on discord!

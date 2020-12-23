@@ -1,10 +1,11 @@
 name: GemsEconomy
 main: me.xanium.gemseconomy.GemsEconomy
-version: 4.9
+version: 4.9.1
 author: Xanium
 description: A multi-currency economy plugin for spigot servers!
 website: https://www.spigotmc.org/resources/gemseconomy.19655/
 load: STARTUP
+api-version: 1.16
 loadbefore:
   - ItemFrameShops
 softdepend: [Vault]
