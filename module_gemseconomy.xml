@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_gemseconomy" default="compile.module.gemseconomy">
+  <dirname property="module.gemseconomy.basedir" file="${ant.file.module_gemseconomy}"/>
+  
+  <property name="module.jdk.home.gemseconomy" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.gemseconomy" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.gemseconomy" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.gemseconomy" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="gemseconomy.output.dir" value="${module.gemseconomy.basedir}/target/classes"/>
+  <property name="gemseconomy.testoutput.dir" value="${module.gemseconomy.basedir}/target/test-classes"/>
+  
+  <path id="gemseconomy.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="gemseconomy.module.production.classpath">
+    <path refid="${module.jdk.classpath.gemseconomy}"/>
+    <path refid="library.maven:_org.spigotmc:spigot:1.13.2-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_net.milkbowl.vault:vaultapi:1.7.classpath"/>
+    <path refid="library.maven:_org.bukkit:bukkit:1.13.1-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_com.googlecode.json-simple:json-simple:1.1.1.classpath"/>
+    <path refid="library.maven:_junit:junit:4.10.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.1.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_com.google.code.gson:gson:2.8.0.classpath"/>
+    <path refid="library.maven:_org.yaml:snakeyaml:1.21.classpath"/>
+    <path refid="library.maven:_com.zaxxer:hikaricp:3.1.0.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.25.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+  </path>
+  
+  <path id="gemseconomy.runtime.production.module.classpath">
+    <pathelement location="${gemseconomy.output.dir}"/>
+    <path refid="library.maven:_com.zaxxer:hikaricp:3.1.0.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.25.classpath"/>
+  </path>
+  
+  <path id="gemseconomy.module.classpath">
+    <path refid="${module.jdk.classpath.gemseconomy}"/>
+    <pathelement location="${gemseconomy.output.dir}"/>
+    <path refid="library.maven:_org.spigotmc:spigot:1.13.2-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_net.milkbowl.vault:vaultapi:1.7.classpath"/>
+    <path refid="library.maven:_org.bukkit:bukkit:1.13.1-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_com.googlecode.json-simple:json-simple:1.1.1.classpath"/>
+    <path refid="library.maven:_junit:junit:4.10.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.1.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_com.google.code.gson:gson:2.8.0.classpath"/>
+    <path refid="library.maven:_org.yaml:snakeyaml:1.21.classpath"/>
+    <path refid="library.maven:_com.zaxxer:hikaricp:3.1.0.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.25.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+  </path>
+  
+  <path id="gemseconomy.runtime.module.classpath">
+    <pathelement location="${gemseconomy.testoutput.dir}"/>
+    <pathelement location="${gemseconomy.output.dir}"/>
+    <path refid="library.maven:_org.spigotmc:spigot:1.13.2-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_net.milkbowl.vault:vaultapi:1.7.classpath"/>
+    <path refid="library.maven:_org.bukkit:bukkit:1.13.1-r0.1-snapshot.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_com.googlecode.json-simple:json-simple:1.1.1.classpath"/>
+    <path refid="library.maven:_junit:junit:4.10.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.1.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:21.0.classpath"/>
+    <path refid="library.maven:_com.google.code.gson:gson:2.8.0.classpath"/>
+    <path refid="library.maven:_org.yaml:snakeyaml:1.21.classpath"/>
+    <path refid="library.maven:_com.zaxxer:hikaricp:3.1.0.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.25.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.gemseconomy">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.gemseconomy">
+    <patternset refid="excluded.from.module.gemseconomy"/>
+  </patternset>
+  
+  <path id="gemseconomy.module.sourcepath">
+    <dirset dir="${module.gemseconomy.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="gemseconomy.module.test.sourcepath">
+    <dirset dir="${module.gemseconomy.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.gemseconomy" depends="compile.module.gemseconomy.production,compile.module.gemseconomy.tests" description="Compile module GemsEconomy"/>
+  
+  <target name="compile.module.gemseconomy.production" depends="register.custom.compilers" description="Compile module GemsEconomy; production classes">
+    <mkdir dir="${gemseconomy.output.dir}"/>
+    <javac2 destdir="${gemseconomy.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.gemseconomy}/javac">
+      <compilerarg line="${compiler.args.gemseconomy}"/>
+      <bootclasspath refid="gemseconomy.module.bootclasspath"/>
+      <classpath refid="gemseconomy.module.production.classpath"/>
+      <src refid="gemseconomy.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.gemseconomy"/>
+    </javac2>
+    
+    <copy todir="${gemseconomy.output.dir}">
+      <fileset dir="${module.gemseconomy.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.gemseconomy.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.gemseconomy.tests" depends="register.custom.compilers,compile.module.gemseconomy.production" description="compile module GemsEconomy; test classes" unless="skip.tests">
+    <mkdir dir="${gemseconomy.testoutput.dir}"/>
+    <javac2 destdir="${gemseconomy.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.gemseconomy}/javac">
+      <compilerarg line="${compiler.args.gemseconomy}"/>
+      <bootclasspath refid="gemseconomy.module.bootclasspath"/>
+      <classpath refid="gemseconomy.module.classpath"/>
+      <src refid="gemseconomy.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.gemseconomy"/>
+    </javac2>
+    
+    <copy todir="${gemseconomy.testoutput.dir}">
+      <fileset dir="${module.gemseconomy.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.gemseconomy" description="cleanup module">
+    <delete dir="${gemseconomy.output.dir}"/>
+    <delete dir="${gemseconomy.testoutput.dir}"/>
+  </target>
+</project>
