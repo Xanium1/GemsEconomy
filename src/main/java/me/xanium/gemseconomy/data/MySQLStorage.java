@@ -162,7 +162,7 @@ public class MySQLStorage extends DataStore {
 
     @Override
     public void saveCurrency(Currency currency) {
-        final String SAVE_CURRENCY = "INSERT INTO `" + getTablePrefix() + "_currencies` (`uuid`, `name_singular`, `name_plural`, `default_balance`, `symbol`, `decimals_supported`, `is_default`, `payable`, `color`, `exchange_rate`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = ?, `name_singular` = ?, `name_plural` = ?, `default_balance` = ?, `symbol` = ?, `decimals_supported` = ?, `is_default` = ?, `payable` = ?, `color` = ?, `exchange_rate` = ?";
+        final String SAVE_CURRENCY = "INSERT INTO `" + getTablePrefix() + "_currencies` (`uuid`, `name_singular`, `name_plural`, `default_balance`, `symbol`, `decimals_supported`, `is_default`, `payable`, `color`, `exchange_rate`) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = VALUES(`uuid`), `name_singular` = VALUES(`name_singular`), `name_plural` = VALUES(`name_plural`), `default_balance` = VALUES(`default_balance`), `symbol` = VALUES(`symbol`), `decimals_supported` = VALUES(`decimals_supported`), `is_default` = VALUES(`is_default`), `payable` = VALUES(`payable`), `color` = VALUES(`color`), `exchange_rate` = VALUES(`exchange_rate`)";
         try (Connection connection = getHikari().getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(SAVE_CURRENCY);
             stmt.setString(1, currency.getUuid().toString());
@@ -314,7 +314,7 @@ public class MySQLStorage extends DataStore {
 
     @Override
     public void createAccount(Account account) {
-        final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `nickname` = ?, `uuid` = ?, `payable` = ?";
+        final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `nickname` = VALUES(`nickname`), `uuid` = VALUES(`uuid`), `payable` = VALUES(`payable`)";
 
         try (Connection connection = getHikari().getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(SAVE_ACCOUNT);
@@ -348,8 +348,8 @@ public class MySQLStorage extends DataStore {
 
     @Override
     public void saveAccount(Account account) {
-        final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `nickname` = ?, `uuid` = ?, `payable` = ?";
-        final String SAVE_BALANCES = "INSERT INTO `" + getTablePrefix() + "_balances` (`account_id`, `currency_id`, `balance`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `account_id` = ?, `currency_id` = ?, `balance` = ?";
+        final String SAVE_ACCOUNT = "INSERT INTO `" + getTablePrefix() + "_accounts` (`nickname`, `uuid`, `payable`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `nickname` = VALUES(`nickname`), `uuid` = VALUES(`uuid`), `payable` = VALUES(`payable`)";
+        final String SAVE_BALANCES = "INSERT INTO `" + getTablePrefix() + "_balances` (`account_id`, `currency_id`, `balance`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `account_id` = VALUES(`account_id`), `currency_id` = VALUES(`currency_id`), `balance` = VALUES(`balance`)";
 
         try (Connection connection = getHikari().getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(SAVE_ACCOUNT);
