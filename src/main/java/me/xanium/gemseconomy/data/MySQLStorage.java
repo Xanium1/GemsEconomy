@@ -39,13 +39,13 @@ public class MySQLStorage extends DataStore {
     }
 
     private void setupTables() throws SQLException {
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_currencies(    id INT PRIMARY KEY AUTO_INCREMENT,    uuid VARCHAR(255),    name_singular VARCHAR(255),    name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
+        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_currencies(uuid VARCHAR(255) NOT NULL UNIQUE, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
             ps.execute();
         }
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_accounts(    id INT PRIMARY KEY AUTO_INCREMENT,    nickname VARCHAR(255),    uuid VARCHAR(255),    payable INT);")) {
+        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_accounts(nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL UNIQUE, payable INT);")) {
             ps.execute();
         }
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_balances(    account_id VARCHAR(255),    currency_id VARCHAR(255),    balance DECIMAL);")) {
+        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.getTablePrefix() + "_balances(account_id VARCHAR(255), currency_id VARCHAR(255), balance DECIMAL);")) {
             ps.execute();
         }
     }
@@ -175,6 +175,8 @@ public class MySQLStorage extends DataStore {
             stmt.setInt(8, currency.isPayable() ? 1 : 0);
             stmt.setString(9, currency.getColor().name());
             stmt.setDouble(10, currency.getExchangeRate());
+
+            stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -322,7 +324,6 @@ public class MySQLStorage extends DataStore {
             stmt.setString(2, account.getUuid().toString());
             stmt.setInt(3, account.canReceiveCurrency() ? 1 : 0);
             stmt.execute();
-
 
             for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                 double balance = currency.getDefaultBalance();

@@ -21,7 +21,7 @@ public class Currency {
     private String plural;
     private String symbol = null;
     private ChatColor color = ChatColor.WHITE;
-    private boolean decimalSupported = false;
+    private boolean decimalSupported = true;
     private boolean payable = true;
     private boolean defaultCurrency = false;
     private double defaultBalance = 0.0;

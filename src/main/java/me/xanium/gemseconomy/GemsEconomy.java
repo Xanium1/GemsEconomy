@@ -32,6 +32,14 @@ import java.io.IOException;
 
 public class GemsEconomy extends JavaPlugin {
 
+    /**
+     * PLANS FORWARD
+     *
+     * Make the accounts table contain the balances, like i've done on my server
+     *
+     *
+     */
+
     private static GemsEconomy instance;
 
     private DataStore dataStore = null;
