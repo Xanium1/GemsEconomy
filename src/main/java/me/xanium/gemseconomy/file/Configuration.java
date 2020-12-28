@@ -51,12 +51,13 @@ public class Configuration {
         config.addDefault("mysql.username", "root");
         config.addDefault("mysql.password", "password");
 
-        config.addDefault("sqlite.file", "database.sqlite");
+      //  config.addDefault("sqlite.file", "database.sqlite");
 
         config.addDefault("cheque.material", Material.PAPER.toString());
         config.addDefault("cheque.name", "&aBank Note");
         config.addDefault("cheque.lore", Arrays.asList("&7Worth: {value}.", "&7&oWritten by {player}"));
         config.addDefault("cheque.console_name", "Console");
+        config.addDefault("cheque.enabled", true);
 
         config.addDefault(path + "prefix", "&2&lGemsEconomy> ");
         config.addDefault(path + "nopermission", "&7You don't have permission to do this.");

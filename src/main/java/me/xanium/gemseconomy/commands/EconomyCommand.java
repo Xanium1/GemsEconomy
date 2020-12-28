@@ -12,6 +12,7 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,6 @@ public class EconomyCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s124, String[] args) {
-
         if (!sender.hasPermission("gemseconomy.command.economy")) {
             sender.sendMessage(F.getNoPerms());
             return true;
@@ -51,6 +51,10 @@ public class EconomyCommand implements CommandExecutor {
                 return true;
             }
             set(sender, args);
+        } else if (args[0].equalsIgnoreCase("cache")) {
+            for(Account a : plugin.getAccountManager().getAccounts()){
+                UtilServer.consoleLog("Account: " + a.getNickname() + " cached");
+            }
         } else {
             sender.sendMessage(F.getUnknownSubCommand());
         }

@@ -30,7 +30,7 @@ public class AccountManager {
     }
 
     public Account getAccount(String name) {
-        for (Account account : accounts) {
+        for (Account account : this.accounts) {
             if (account.getNickname() == null || !account.getNickname().equalsIgnoreCase(name)) continue;
             return account;
         }
@@ -38,7 +38,7 @@ public class AccountManager {
     }
 
     public Account getAccount(UUID uuid) {
-        for (Account account : accounts) { // This throws CME randomly
+        for (Account account : this.accounts) { // This throws CME randomly
             if (!account.getUuid().equals(uuid)) continue;
             return account;
         }
@@ -46,7 +46,7 @@ public class AccountManager {
     }
 
     public void removeAccount(UUID uuid){
-        for(int i = 0; i < accounts.size(); i++){
+        for(int i = 0; i < this.accounts.size(); i++){
             Account a = getAccounts().get(i);
             if(a.getUuid().equals(uuid)){
                 accounts.remove(i);
@@ -56,9 +56,9 @@ public class AccountManager {
     }
 
     public void add(Account account) {
-        if(accounts.contains(account))return;
+        if(this.accounts.contains(account))return;
 
-        accounts.add(account);
+        this.accounts.add(account);
     }
 
     public List<Account> getAccounts() {

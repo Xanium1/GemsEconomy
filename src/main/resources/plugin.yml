@@ -12,7 +12,7 @@ softdepend: [Vault]
 commands:
   balance:
     description: Shows your balances
-    usage: /gbalance (account)
+    usage: /balance (account)
     aliases: [gbal, gmoney, bal]
   baltop:
     description: Shows the top balances of the server
@@ -20,7 +20,7 @@ commands:
     aliases: [gmoneytop, gecotop, gtop, gbaltop]
   currency:
     description: Manage the currencies.
-    usage: /gcurrencies
+    usage: /currency
     aliases: [gcurr, gemscurrencies, gcurrency, currencies]
   economy:
     description: Give, set or take currency.

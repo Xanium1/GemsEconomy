@@ -26,6 +26,9 @@ public class ChequeCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
+        if(!plugin.isChequesEnabled()){
+            return true;
+        }
 
         if (!(sender instanceof Player)) {
             sender.sendMessage(F.getNoConsole());

@@ -8,7 +8,9 @@
 package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.CachedTopListEntry;
 import me.xanium.gemseconomy.currency.Currency;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -18,11 +20,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.UUID;
 
-public class YamlStorage extends DataStore {
+public class YamlStorage extends DataStorage {
 
     private YamlConfiguration configuration;
     private File file;
@@ -110,8 +112,8 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public Map<String, Double> getTopList(Currency currency, int offset, int amount) {
-        return null;
+    public void getTopList(Currency currency, int offset, int amount, Callback<LinkedList<CachedTopListEntry>> callback) {
+        throw new UnsupportedOperationException("YAML does not support Top Lists!");
     }
 
     private void loadBalances(Account account) {
@@ -138,10 +140,14 @@ public class YamlStorage extends DataStore {
         ArrayList<Account> accounts = new ArrayList<>();
         for(String uuid : getConfig().getConfigurationSection(path).getKeys(false)){
             Account acc = loadAccount(UUID.fromString(uuid));
-            loadBalances(acc);
             accounts.add(acc);
         }
         return accounts;
+    }
+
+    @Override
+    public void createAccount(Account account) {
+        throw new UnsupportedOperationException("YAML does not utilize #createAccount()!");
     }
 
     @Override
@@ -157,7 +163,6 @@ public class YamlStorage extends DataStore {
                         Account account = new Account(UUID.fromString(uuid), nick);
                         account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
                         loadBalances(account);
-                        plugin.getAccountManager().add(account);
                         return account;
                     }
                 }
@@ -167,9 +172,6 @@ public class YamlStorage extends DataStore {
     }
 
     @Override
-    public void createAccount(Account account) {}
-
-    @Override
     public Account loadAccount(UUID uuid) {
         String path = "accounts." + uuid.toString();
         String nick = getConfig().getString(path + ".nickname");
@@ -177,10 +179,25 @@ public class YamlStorage extends DataStore {
             Account account = new Account(uuid, nick);
             account.setCanReceiveCurrency(getConfig().getBoolean(path + ".payable"));
             loadBalances(account);
-            plugin.getAccountManager().add(account);
             return account;
         }
         return null;
+    }
+
+    @Override
+    public void loadAccount(UUID uuid, Callback<Account> callback) {
+        SchedulerUtils.runAsync(() -> {
+            Account account = this.loadAccount(uuid);
+            SchedulerUtils.run(() -> callback.call(account));
+        });
+    }
+
+    @Override
+    public void loadAccount(String name, Callback<Account> callback) {
+        SchedulerUtils.runAsync(() -> {
+            Account account = this.loadAccount(name);
+            SchedulerUtils.run(() -> callback.call(account));
+        });
     }
 
     @Override
@@ -213,7 +230,7 @@ public class YamlStorage extends DataStore {
 
     @Override
     public void updateCurrencyLocally(Currency currency) {
-        throw new UnsupportedOperationException("This method is not supported in SQLite.");
+        throw new UnsupportedOperationException("YAML does not support updates. Only READ/WRITE");
     }
 
     public YamlConfiguration getConfig() {

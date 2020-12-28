@@ -12,6 +12,7 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,8 +24,7 @@ public class BalanceCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(final CommandSender sender, Command command, String s, final String[] args) {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-
+        SchedulerUtils.runAsync(() -> {
             if (!sender.hasPermission("gemseconomy.command.balance")) {
                 sender.sendMessage(F.getNoPerms());
                 return;
@@ -32,10 +32,9 @@ public class BalanceCommand implements CommandExecutor {
             Account account;
             if (args.length == 0 && sender instanceof Player) {
                 account = plugin.getAccountManager().getAccount((Player) sender);
-            }
-            else if (sender.hasPermission("gemseconomy.command.balance.other") && args.length == 1) {
+            } else if (sender.hasPermission("gemseconomy.command.balance.other") && args.length == 1) {
                 account = plugin.getAccountManager().getAccount(args[0]);
-            }else{
+            } else {
                 sender.sendMessage(F.getNoPerms());
                 return;
             }
@@ -51,12 +50,12 @@ public class BalanceCommand implements CommandExecutor {
                         return;
                     }
                     double balance = account.getBalance(currency);
-                    sender.sendMessage(F.getBalance().replace("{player}", account.getDisplayName()).replace("{currencycolor}", ""+currency.getColor()).replace("{balance}", currency.format(balance)));
+                    sender.sendMessage(F.getBalance().replace("{player}", account.getDisplayName()).replace("{currencycolor}", "" + currency.getColor()).replace("{balance}", currency.format(balance)));
                 } else {
                     sender.sendMessage(F.getBalanceMultiple().replace("{player}", account.getDisplayName()));
                     for (Currency currency : plugin.getCurrencyManager().getCurrencies()) {
                         double balance = account.getBalance(currency);
-                        sender.sendMessage(F.getBalanceList().replace("{currencycolor}", currency.getColor()+"").replace("{format}", currency.format(balance)));
+                        sender.sendMessage(F.getBalanceList().replace("{currencycolor}", currency.getColor() + "").replace("{format}", currency.format(balance)));
                     }
                 }
             } else {

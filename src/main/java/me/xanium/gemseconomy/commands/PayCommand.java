@@ -13,6 +13,7 @@ import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.event.GemsPayEvent;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +30,7 @@ public class PayCommand implements CommandExecutor {
             sender.sendMessage(F.getNoConsole());
             return true;
         }
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtils.runAsync(() -> {
             if (!sender.hasPermission("gemseconomy.command.pay")) {
                 sender.sendMessage(F.getNoPerms());
                 return;
@@ -38,7 +39,7 @@ public class PayCommand implements CommandExecutor {
                 sender.sendMessage(F.getPayUsage());
                 return;
             }
-            if(plugin.getCurrencyManager().getDefaultCurrency() == null){
+            if (plugin.getCurrencyManager().getDefaultCurrency() == null) {
                 sender.sendMessage(F.getNoDefaultCurrency());
                 return;
             }
@@ -87,21 +88,21 @@ public class PayCommand implements CommandExecutor {
                             if (target.canReceiveCurrency()) {
                                 if (account.hasEnough(currency, amount)) {
                                     GemsPayEvent event = new GemsPayEvent(currency, account, target, amount);
-                                    GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
-                                    if(event.isCancelled())return;
+                                    SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
+                                    if (event.isCancelled()) return;
 
                                     double accBal = account.getBalance(currency) - amount;
                                     double tarBal = target.getBalance(currency) + amount;
                                     account.modifyBalance(currency, accBal, true);
                                     target.modifyBalance(currency, tarBal, true);
-                                    GemsEconomy.getInstance().getEconomyLogger().log("[PAYMENT] " + account.getDisplayName() + " (New bal: "+ currency.format(accBal) + ") -> paid " + target.getDisplayName() + " (New bal: " + currency.format(tarBal) + ") - An amount of " + currency.format(amount));
+                                    GemsEconomy.getInstance().getEconomyLogger().log("[PAYMENT] " + account.getDisplayName() + " (New bal: " + currency.format(accBal) + ") -> paid " + target.getDisplayName() + " (New bal: " + currency.format(tarBal) + ") - An amount of " + currency.format(amount));
 
-                                    if(Bukkit.getPlayer(target.getUuid()) != null){
-                                        Bukkit.getPlayer(target.getUuid()).sendMessage(F.getPaidMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", sender.getName()));
+                                    if (Bukkit.getPlayer(target.getUuid()) != null) {
+                                        Bukkit.getPlayer(target.getUuid()).sendMessage(F.getPaidMessage().replace("{currencycolor}", currency.getColor() + "").replace("{amount}", currency.format(amount)).replace("{player}", sender.getName()));
                                     }
-                                    sender.sendMessage(F.getPayerMessage().replace("{currencycolor}", currency.getColor()+"").replace("{amount}", currency.format(amount)).replace("{player}", target.getDisplayName()));
+                                    sender.sendMessage(F.getPayerMessage().replace("{currencycolor}", currency.getColor() + "").replace("{amount}", currency.format(amount)).replace("{player}", target.getDisplayName()));
                                 } else {
-                                    sender.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", ""+currency.getColor()).replace("{currency}", currency.getPlural()));
+                                    sender.sendMessage(F.getInsufficientFunds().replace("{currencycolor}", "" + currency.getColor()).replace("{currency}", currency.getPlural()));
                                 }
                             } else {
                                 sender.sendMessage(F.getCannotReceive().replace("{player}", target.getDisplayName()));

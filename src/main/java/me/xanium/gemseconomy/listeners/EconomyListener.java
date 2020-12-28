@@ -11,6 +11,7 @@ package me.xanium.gemseconomy.listeners;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,25 +30,27 @@ public class EconomyListener implements Listener {
         Player player = event.getPlayer();
         if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
 
-        GemsEconomy.doAsync(() -> {
+        SchedulerUtils.runAsync(() -> {
             Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
 
             if (account == null) {
                 account = new Account(player.getUniqueId(), player.getName());
 
                 if (!plugin.getDataStore().getName().equalsIgnoreCase("yaml")) {
+                    // MYSQL
                     plugin.getDataStore().createAccount(account);
                 } else {
+                    // YAML
                     plugin.getDataStore().saveAccount(account);
-                    plugin.getAccountManager().add(account);
                 }
 
                 UtilServer.consoleLog("New Account created for: " + account.getDisplayName());
-            } else if (!account.getNickname().equals(player.getName()) || account.getNickname() == null) {
+            } else if (account.getNickname() == null || !account.getNickname().equals(player.getName())) {
                 account.setNickname(player.getName());
                 plugin.getDataStore().saveAccount(account);
                 UtilServer.consoleLog("Name change found! Updating account " + account.getDisplayName() + "...");
             }
+
         });
     }
 
@@ -57,21 +60,23 @@ public class EconomyListener implements Listener {
         plugin.getAccountManager().removeAccount(player.getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+
+        // Caching
+        SchedulerUtils.run(() -> {
             Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
             if (account != null) {
                 plugin.getAccountManager().add(account);
             }
         });
 
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+        SchedulerUtils.runLater(40L, () -> {
             if (plugin.getCurrencyManager().getDefaultCurrency() == null && (player.isOp() || player.hasPermission("gemseconomy.command.currency"))) {
                 player.sendMessage(F.getPrefix() + "§cYou have not made a currency yet. Please do so by \"§e/currency§c\".");
             }
-        }, 60);
+        });
     }
 
 }

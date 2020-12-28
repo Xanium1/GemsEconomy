@@ -4,6 +4,7 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,7 +15,7 @@ public class ExchangeCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String v21315, String[] args) {
-        GemsEconomy.doAsync(() -> {
+        SchedulerUtils.runAsync(() -> {
             if (!sender.hasPermission("gemseconomy.command.exchange")) {
                 sender.sendMessage(F.getNoPerms());
                 return;

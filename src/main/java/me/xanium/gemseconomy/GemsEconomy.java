@@ -13,15 +13,15 @@ import me.xanium.gemseconomy.bungee.UpdateForwarder;
 import me.xanium.gemseconomy.cheque.ChequeManager;
 import me.xanium.gemseconomy.commands.*;
 import me.xanium.gemseconomy.currency.CurrencyManager;
-import me.xanium.gemseconomy.data.DataStore;
+import me.xanium.gemseconomy.data.DataStorage;
 import me.xanium.gemseconomy.data.MySQLStorage;
-import me.xanium.gemseconomy.data.SQLiteDataStore;
 import me.xanium.gemseconomy.data.YamlStorage;
 import me.xanium.gemseconomy.file.Configuration;
 import me.xanium.gemseconomy.listeners.EconomyListener;
 import me.xanium.gemseconomy.logging.EconomyLogger;
 import me.xanium.gemseconomy.nbt.NMSVersion;
 import me.xanium.gemseconomy.utils.Metrics;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.Updater;
 import me.xanium.gemseconomy.utils.UtilServer;
 import me.xanium.gemseconomy.vault.VaultHandler;
@@ -32,17 +32,9 @@ import java.io.IOException;
 
 public class GemsEconomy extends JavaPlugin {
 
-    /**
-     * PLANS FORWARD
-     *
-     * Make the accounts table contain the balances, like i've done on my server
-     *
-     *
-     */
-
     private static GemsEconomy instance;
 
-    private DataStore dataStore = null;
+    private DataStorage dataStorage = null;
     private AccountManager accountManager;
     private ChequeManager chequeManager;
     private CurrencyManager currencyManager;
@@ -55,27 +47,38 @@ public class GemsEconomy extends JavaPlugin {
     private boolean debug = false;
     private boolean vault = false;
     private boolean logging = false;
+    private boolean cheques = true;
 
     private boolean disabling = false;
 
     /**
-     * Supports 1.16.4 now!
-     * Bugs fixed:
-     * The first currency you create was not set to default. This is now fixed
+     * Bug fix Update
      *
-     * HikariCP updated to 3.4.5
-     * PlaceholderAPI expansion is also fixed!
+     * MySQL would not write or read any data from database - Fixed (Some help from @FurryKitten @ github)
+     * Rewritten many parts of loading / saving account data in MySQL.
+     * YAML Storage would cache offline users when adding currency to them - Fixed
+     * Balance Top command has been rewritten to support more efficient SQL queries.
+     * Balance Top cache expiry lowered to 3 minutes from 5.
+     * Added an option to enable/disable cheques in config.
+     * There has also been many internal changes here and there.
+     *
+     * SQLITE Support has been dropped! IF this is relevant for you!
+     * Please change your backend to either YAML or MySQL through the
+     * command /currency convert yaml|mysql
+     * Make sure to enter the proper login credentials to MySQL and restart your server
+     * before doing this, if you are gonna use MySQL.
+     *
+     * THIS UPDATE MODIFIES HOW A PLAYERS BALANCE IS SAVED, ONLY RELEVANT FOR MYSQL USERS!
+     * Please take a backup of your balances & accounts table before you start your server
+     * with this new version of GemsEconomy!
+     * The plugin will automatically alter the old table and add the new column.
+     * When players log in their data will be converted to the new format.
+     * IF you are using mysql, and utilize /baltop command a lot, the baltop might become
+     * inaccurate due to the players need to log on your server before it can read their balances.
      *
      * Please let me know if you find bugs!
-     * PM me or contact me on discord!
+     * PM me here @ SpigotMC
      *
-     */
-    
-
-
-    /**
-     * Todo List:
-     * Add placeholder to get all the amount of money of a currency
      */
 
     @Override
@@ -86,6 +89,7 @@ public class GemsEconomy extends JavaPlugin {
         setDebug(getConfig().getBoolean("debug"));
         setVault(getConfig().getBoolean("vault"));
         setLogging(getConfig().getBoolean("transaction_log"));
+        setCheques(getConfig().getBoolean("cheque.enabled"));
     }
 
     @Override
@@ -95,7 +99,6 @@ public class GemsEconomy extends JavaPlugin {
         nmsVersion = new NMSVersion();
         accountManager = new AccountManager(this);
         currencyManager = new CurrencyManager(this);
-        chequeManager = new ChequeManager(this);
         economyLogger = new EconomyLogger(this);
         metrics = new Metrics(this);
         updateForwarder = new UpdateForwarder(this);
@@ -125,7 +128,11 @@ public class GemsEconomy extends JavaPlugin {
             getEconomyLogger().save();
         }
 
-        doAsync(this::checkForUpdate);
+        if(isChequesEnabled()){
+            chequeManager = new ChequeManager(this);
+        }
+
+        SchedulerUtils.runAsync(this::checkForUpdate);
     }
 
     @Override
@@ -141,12 +148,14 @@ public class GemsEconomy extends JavaPlugin {
 
     public void initializeDataStore(String strategy, boolean load) {
 
-        DataStore.getMethods().add(new YamlStorage(new File(getDataFolder(), "data.yml")));
-        DataStore.getMethods().add(new MySQLStorage(getConfig().getString("mysql.host"), getConfig().getInt("mysql.port"), getConfig().getString("mysql.database"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password")));
-        DataStore.getMethods().add(new SQLiteDataStore(new File(getDataFolder(), getConfig().getString("sqlite.file"))));
+        DataStorage.getMethods().add(new YamlStorage(new File(getDataFolder(), "data.yml")));
+        DataStorage.getMethods().add(new MySQLStorage(getConfig().getString("mysql.host"), getConfig().getInt("mysql.port"), getConfig().getString("mysql.database"), getConfig().getString("mysql.username"), getConfig().getString("mysql.password")));
+
+        // Disabled. Not many are using SQLite anyway. And MySQL has much better performance!
+        //DataStorage.getMethods().add(new SQLiteStorage(new File(getDataFolder(), getConfig().getString("sqlite.file"))));
 
         if (strategy != null) {
-            dataStore = DataStore.getMethod(strategy);
+            dataStorage = DataStorage.getMethod(strategy);
         } else {
             UtilServer.consoleLog("§cNo valid storage method provided.");
             UtilServer.consoleLog("§cCheck your files, then try again.");
@@ -189,16 +198,8 @@ public class GemsEconomy extends JavaPlugin {
         }
     }
 
-    public static void doAsync(Runnable runnable) {
-        getInstance().getServer().getScheduler().runTaskAsynchronously(getInstance(), runnable);
-    }
-
-    public static void doSync(Runnable runnable) {
-        getInstance().getServer().getScheduler().runTask(getInstance(), runnable);
-    }
-
-    public DataStore getDataStore() {
-        return dataStore;
+    public DataStorage getDataStore() {
+        return dataStorage;
     }
 
     public static GemsEconomy getInstance() {
@@ -264,5 +265,13 @@ public class GemsEconomy extends JavaPlugin {
 
     public boolean isDisabling() {
         return disabling;
+    }
+
+    public boolean isChequesEnabled() {
+        return cheques;
+    }
+
+    public void setCheques(boolean cheques) {
+        this.cheques = cheques;
     }
 }

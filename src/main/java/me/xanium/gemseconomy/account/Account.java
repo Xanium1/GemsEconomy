@@ -12,6 +12,7 @@ import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.currency.Currency;
 import me.xanium.gemseconomy.event.GemsConversionEvent;
 import me.xanium.gemseconomy.event.GemsTransactionEvent;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.TranactionType;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.Bukkit;
@@ -22,20 +23,21 @@ import java.util.UUID;
 
 public class Account {
 
-    private UUID uuid;
+    private final UUID uuid;
     private String nickname;
-    private Map<Currency, Double> balances = new HashMap<>();
+    private Map<Currency, Double> balances;
     private boolean canReceiveCurrency = true;
 
     public Account(UUID uuid, String nickname) {
         this.uuid = uuid;
         this.nickname = nickname;
+        this.balances = new HashMap<>();
     }
 
     public boolean withdraw(Currency currency, double amount) {
         if (hasEnough(currency, amount)) {
             GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.WITHDRAW);
-            GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
+            SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
             if(event.isCancelled())return false;
 
             double finalAmount = getBalance(currency) - amount;
@@ -50,7 +52,7 @@ public class Account {
         if (canReceiveCurrency()) {
 
             GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.DEPOSIT);
-            GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
+            SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
             if(event.isCancelled())return false;
 
             double finalAmount = getBalance(currency) + amount;
@@ -63,7 +65,7 @@ public class Account {
 
     public boolean convert(Currency exchanged, double exchangeAmount, Currency received, double amount) {
         GemsConversionEvent event = new GemsConversionEvent(exchanged, received, this, exchangeAmount, amount);
-        GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
+        SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
         if(event.isCancelled())return false;
 
         if (amount != -1) {
@@ -132,7 +134,7 @@ public class Account {
 
     public void setBalance(Currency currency, double amount) {
         GemsTransactionEvent event = new GemsTransactionEvent(currency, this, amount, TranactionType.SET);
-        GemsEconomy.doSync(() -> Bukkit.getPluginManager().callEvent(event));
+        SchedulerUtils.run(() -> Bukkit.getPluginManager().callEvent(event));
         if(event.isCancelled())return;
 
         getBalances().put(currency, amount);
@@ -169,7 +171,7 @@ public class Account {
                 return getBalances().get(currency);
             }
         }
-        return -100; // Do not edit this because the datastore conversion needs this value to decide if the player does have a balance in this currency.
+        return 0; // Do not edit this
     }
 
     public String getDisplayName() {

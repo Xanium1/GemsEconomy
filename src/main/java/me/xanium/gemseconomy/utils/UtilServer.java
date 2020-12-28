@@ -8,6 +8,7 @@
 
 package me.xanium.gemseconomy.utils;
 
+import me.xanium.gemseconomy.GemsEconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
@@ -21,7 +22,7 @@ public class UtilServer {
     private static final String Error_Prefix = "§c[G-Eco-Error] §f";
 
     public static void consoleLog(String message){
-        getServer().getConsoleSender().sendMessage(Console_Prefix + colorize(message));
+        if(GemsEconomy.getInstance().isDebug()) getServer().getConsoleSender().sendMessage(Console_Prefix + colorize(message));
     }
 
     public static void consoleLog(Throwable message){

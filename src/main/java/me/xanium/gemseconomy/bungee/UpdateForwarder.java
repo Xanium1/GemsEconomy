@@ -6,6 +6,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.currency.Currency;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.UtilServer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -62,7 +63,7 @@ public class UpdateForwarder implements PluginMessageListener {
             else if(type.equals("account")){
                 UUID uuid = UUID.fromString(name);
                 plugin.getAccountManager().removeAccount(uuid);
-                GemsEconomy.doAsync(() -> plugin.getDataStore().loadAccount(uuid));
+                SchedulerUtils.runAsync(() -> plugin.getDataStore().loadAccount(uuid));
                 if(plugin.isDebug()){
                     UtilServer.consoleLog(channelName + " - Account " + name + " updated.");
                 }

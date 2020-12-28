@@ -108,7 +108,7 @@ public class GemsEconomyAPI {
 
     /**
      *
-     * @param name - Currency name.
+     * @param name - Currency singular or plural.
      * @return - Currency Object.
      */
     public Currency getCurrency(String name){

@@ -10,28 +10,29 @@ package me.xanium.gemseconomy.data;
 
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
+import me.xanium.gemseconomy.currency.CachedTopListEntry;
 import me.xanium.gemseconomy.currency.Currency;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.UUID;
 
-public abstract class DataStore {
+public abstract class DataStorage {
 
     public final GemsEconomy plugin = GemsEconomy.getInstance();
 
     private String name;
     private boolean topSupported;
 
-    public DataStore(String name, boolean topSupported) {
+    public DataStorage(String name, boolean topSupported) {
         this.name = name;
         this.topSupported = topSupported;
     }
 
-    private static ArrayList<DataStore> methods = new ArrayList<>();
+    private static ArrayList<DataStorage> methods = new ArrayList<>();
 
-    public static DataStore getMethod(String name) {
-        for (DataStore store : getMethods()) {
+    public static DataStorage getMethod(String name) {
+        for (DataStorage store : getMethods()) {
             if (store.getName().equalsIgnoreCase(name)) {
                 return store;
             }
@@ -39,7 +40,7 @@ public abstract class DataStore {
         return null;
     }
 
-    public static ArrayList<DataStore> getMethods() {
+    public static ArrayList<DataStorage> getMethods() {
         return methods;
     }
 
@@ -55,16 +56,24 @@ public abstract class DataStore {
 
     public abstract void deleteCurrency(Currency currency);
 
-    public abstract Map<String, Double> getTopList(Currency currency, int offset, int amount);
+    public abstract void getTopList(Currency currency, int offset, int amount, Callback<LinkedList<CachedTopListEntry>> callback);
 
-    public abstract Account loadAccount(String string);
+    public abstract Account loadAccount(String name);
 
     public abstract Account loadAccount(UUID uuid);
+
+    public abstract void loadAccount(UUID uuid, Callback<Account> callback);
+
+    public abstract void loadAccount(String name, Callback<Account> callback);
 
     public abstract void saveAccount(Account account);
 
     public abstract void deleteAccount(Account account);
 
+    /**
+     * This is MYSQL ONLY!
+     * @param account - Account to save to sql. See EconomyListener.java
+     */
     public abstract void createAccount(Account account);
 
     public abstract ArrayList<Account> getOfflineAccounts();

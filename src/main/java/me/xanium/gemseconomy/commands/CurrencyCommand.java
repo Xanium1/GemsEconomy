@@ -23,8 +23,9 @@ package me.xanium.gemseconomy.commands;
 import me.xanium.gemseconomy.GemsEconomy;
 import me.xanium.gemseconomy.account.Account;
 import me.xanium.gemseconomy.currency.Currency;
-import me.xanium.gemseconomy.data.DataStore;
+import me.xanium.gemseconomy.data.DataStorage;
 import me.xanium.gemseconomy.file.F;
+import me.xanium.gemseconomy.utils.SchedulerUtils;
 import me.xanium.gemseconomy.utils.UtilServer;
 import me.xanium.gemseconomy.utils.UtilString;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ public class CurrencyCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s124, String[] args) {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtils.runAsync(() -> {
             if (!sender.hasPermission("gemseconomy.command.currency")) {
                 sender.sendMessage(F.getNoPerms());
                 return;
@@ -56,11 +57,11 @@ public class CurrencyCommand implements CommandExecutor {
                     if (args.length == 3) {
                         String single = args[1];
                         String plural = args[2];
-                        if(plugin.getCurrencyManager().currencyExist(single) || plugin.getCurrencyManager().currencyExist(plural)){
+                        if (plugin.getCurrencyManager().currencyExist(single) || plugin.getCurrencyManager().currencyExist(plural)) {
                             sender.sendMessage(F.getPrefix() + "§cCurrency already exists.");
                             return;
                         }
-                        
+
                         plugin.getCurrencyManager().createNewCurrency(single, plural);
                         sender.sendMessage(F.getPrefix() + "§7Created currency: §a" + single);
                     } else {
@@ -272,17 +273,17 @@ public class CurrencyCommand implements CommandExecutor {
                 } else if (cmd.equalsIgnoreCase("convert")) {
                     if (args.length == 2) {
                         String method = args[1];
-                        DataStore current = plugin.getDataStore();
-                        DataStore ds = DataStore.getMethod(method);
+                        DataStorage current = plugin.getDataStore();
+                        DataStorage ds = DataStorage.getMethod(method);
 
                         if (current == null) {
-                            sender.sendMessage(F.getPrefix() + "Current Data Store is null. Did something go wrong on startup?");
+                            sender.sendMessage(F.getPrefix() + "§7Current Data Store is null. Did something go wrong on startup?");
                             return;
                         }
 
                         if (ds != null) {
                             if (current.getName().equalsIgnoreCase(ds.getName())) {
-                                sender.sendMessage(F.getPrefix() + "You can't convert to the same datastore.");
+                                sender.sendMessage(F.getPrefix() + "§7You can't convert to the same datastore.");
                                 return;
                             }
 
@@ -292,28 +293,32 @@ public class CurrencyCommand implements CommandExecutor {
                             sender.sendMessage(F.getPrefix() + "§aLoading data..");
                             plugin.getAccountManager().getAccounts().clear();
 
-                            ArrayList<Account> offline = new ArrayList<>(plugin.getDataStore().getOfflineAccounts());
                             sender.sendMessage(F.getPrefix() + "§aStored accounts.");
-
+                            ArrayList<Account> offline = new ArrayList<>(plugin.getDataStore().getOfflineAccounts());
+                            UtilServer.consoleLog("Stored Accounts: " + offline.size());
+                            if (GemsEconomy.getInstance().isDebug()) {
+                                for (Account account : offline) {
+                                    UtilServer.consoleLog("Account: " + account.getNickname() + " (" + account.getUuid().toString() + ")");
+                                    for (Currency currency : account.getBalances().keySet()) {
+                                        UtilServer.consoleLog("Balance: " + currency.format(account.getBalance(currency)));
+                                    }
+                                }
+                            }
 
                             ArrayList<Currency> currencies = new ArrayList<>(plugin.getCurrencyManager().getCurrencies());
                             sender.sendMessage(F.getPrefix() + "§aStored currencies.");
                             plugin.getCurrencyManager().getCurrencies().clear();
 
                             if (plugin.isDebug()) {
-                                for (Account a : offline) {
-                                    UtilServer.consoleLog("Account: " + a.getDisplayName() + " has " + a.getBalances().size() + " balances. Map Print: " + a.getBalances().toString());
-                                }
-
                                 for (Currency c : currencies) {
-                                    UtilServer.consoleLog("Currency: " + c.getSingular() + "(" + c.getPlural() + "): " + c.format(100));
+                                    UtilServer.consoleLog("Currency: " + c.getSingular() + "(" + c.getPlural() + "): " + c.format(1000000));
                                 }
                             }
 
                             sender.sendMessage(F.getPrefix() + "§aSwitching from §f" + current.getName() + " §ato §f" + ds.getName() + "§a.");
 
                             if (ds.getName().equalsIgnoreCase("yaml")) {
-                                GemsEconomy.doSync(() -> {
+                                SchedulerUtils.run(() -> {
                                     File data = new File(GemsEconomy.getInstance().getDataFolder() + File.separator + "data.yml");
                                     if (data.exists()) {
                                         data.delete();
@@ -335,7 +340,7 @@ public class CurrencyCommand implements CommandExecutor {
                             }
 
                             sender.sendMessage(F.getPrefix() + "§aInitialized " + ds.getName() + " Data Store. Check console for wrong username/password if using mysql.");
-
+                            sender.sendMessage(F.getPrefix() + "§aIf there are sql login errors, you can just retry after you have fixed the credentials, changed the datastore back to what you were using and restarted the server!");
 
                             if (plugin.getDataStore().getName() != null) {
                                 for (Currency c : currencies) {
@@ -371,31 +376,31 @@ public class CurrencyCommand implements CommandExecutor {
                                 }
 
                                 for (Player players : Bukkit.getOnlinePlayers()) {
-                                    plugin.getDataStore().loadAccount(players.getUniqueId());
+                                    plugin.getDataStore().loadAccount(players.getUniqueId(), account -> plugin.getAccountManager().add(account));
                                 }
                                 sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
+                                sender.sendMessage(F.getPrefix() + "§aData storage conversion is done.");
                             }
-                            sender.sendMessage(F.getPrefix() + "§aData storage conversion is done.");
                         } else {
                             sender.sendMessage(F.getPrefix() + "§cData Storing method not found.");
                         }
-                    }else{
+                    } else {
                         sender.sendMessage(F.getCurrencyUsage_Convert());
                     }
                 } else if (cmd.equalsIgnoreCase("backend")) {
-                    if(args.length == 2) {
+                    if (args.length == 2) {
                         String method = args[1];
-                        DataStore current = plugin.getDataStore();
-                        DataStore ds = DataStore.getMethod(method);
+                        DataStorage current = plugin.getDataStore();
+                        DataStorage ds = DataStorage.getMethod(method);
 
                         if (current == null) {
-                            sender.sendMessage(F.getPrefix() + "Current Data Store is null. Did something go wrong on startup?");
+                            sender.sendMessage(F.getPrefix() + "§7Current Data Store is null. Did something go wrong on startup?");
                             return;
                         }
 
                         if (ds != null) {
                             if (current.getName().equalsIgnoreCase(ds.getName())) {
-                                sender.sendMessage(F.getPrefix() + "You can't convert to the same datastore.");
+                                sender.sendMessage(F.getPrefix() + "§7You can't convert to the same datastore.");
                                 return;
                             }
 
@@ -424,11 +429,11 @@ public class CurrencyCommand implements CommandExecutor {
                             }
 
                             for (Player players : Bukkit.getOnlinePlayers()) {
-                                plugin.getDataStore().loadAccount(players.getUniqueId());
+                                plugin.getDataStore().loadAccount(players.getUniqueId(), account -> plugin.getAccountManager().add(account));
                             }
                             sender.sendMessage(F.getPrefix() + "§aLoaded all accounts for online players.");
                         }
-                    } else{
+                    } else {
                         sender.sendMessage(F.getCurrencyUsage_Backend());
                     }
                 } else {
