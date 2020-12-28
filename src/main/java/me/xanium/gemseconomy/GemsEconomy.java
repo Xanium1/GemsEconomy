@@ -63,10 +63,7 @@ public class GemsEconomy extends JavaPlugin {
      * There has also been many internal changes here and there.
      *
      * SQLITE Support has been dropped! IF this is relevant for you!
-     * Please change your backend to either YAML or MySQL through the
-     * command /currency convert yaml|mysql
-     * Make sure to enter the proper login credentials to MySQL and restart your server
-     * before doing this, if you are gonna use MySQL.
+     * Please change your backend to YAML with the command /currency convert yaml
      *
      * THIS UPDATE MODIFIES HOW A PLAYERS BALANCE IS SAVED, ONLY RELEVANT FOR MYSQL USERS!
      * Please take a backup of your balances & accounts table before you start your server

@@ -62,10 +62,10 @@ public class MySQLStorage extends DataStorage {
     }
 
     private void setupTables() throws SQLException {
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL UNIQUE, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
+        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL PRIMARY KEY, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
             ps.execute();
         }
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.accountsTable + " (nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL UNIQUE, payable INT, balance_data LONGTEXT NOT NULL);")) {
+        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.accountsTable + " (nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL PRIMARY KEY, payable INT, balance_data LONGTEXT NULL);")) {
             ps.execute();
         }
         try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.balancesTable + " (account_id VARCHAR(255), currency_id VARCHAR(255), balance DECIMAL);")) {
@@ -121,7 +121,19 @@ public class MySQLStorage extends DataStorage {
                     stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " ADD balance_data LONGTEXT NULL DEFAULT NULL AFTER `payable`;");
                     stmt.execute();
 
-                    UtilServer.consoleLog("Altered Table " + this.accountsTable + " to support the new balance data saving");
+                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " DROP COLUMN `id`");
+                    stmt.execute();
+
+                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " ADD PRIMARY KEY (uuid)");
+                    stmt.execute();
+
+                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " DROP COLUMN `id`");
+                    stmt.execute();
+
+                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " ADD PRIMARY KEY (uuid)");
+                    stmt.execute();
+
+                    UtilServer.consoleLog("Altered Tables " + this.accountsTable + " to support the new balance data saving");
                 }
             }
         } catch (SQLException e) {
