@@ -60,8 +60,8 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <outputDirectory>F:\Programmering\TestServer\update-nether\plugins</outputDirectory>
-                    <!--<outputDirectory>${project.basedir}</outputDirectory>-->
+                    <!--<outputDirectory>F:\Programmering\TestServer\update-nether\plugins</outputDirectory>-->
+                    <outputDirectory>${project.basedir}</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
