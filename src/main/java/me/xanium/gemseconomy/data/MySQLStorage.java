@@ -310,6 +310,7 @@ public class MySQLStorage extends DataStorage {
         });
     }
 
+    // This method converts the data to the new format
     private Account returnAccountWithBalances(Account account) {
         if (account == null) {
             return null;
@@ -327,6 +328,7 @@ public class MySQLStorage extends DataStorage {
                 account.modifyBalance(currency, set.getDouble("balance"), false);
 
                 if(set.isLast()){
+                    deleteDuplicateAccounts(account);
                     saveAccount(account);
                     deleteOldBalances(account);
                 }
@@ -499,6 +501,8 @@ public class MySQLStorage extends DataStorage {
             PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + this.accountsTable + " WHERE uuid = ? LIMIT 1");
             stmt.setString(1, account.getUuid().toString());
             stmt.execute();
+
+            //TODO Scheduled for removal
             stmt = connection.prepareStatement("DELETE FROM " + this.balancesTable + " WHERE account_id = ?");
             stmt.setString(1, account.getUuid().toString());
             stmt.execute();
@@ -510,6 +514,16 @@ public class MySQLStorage extends DataStorage {
     public void deleteOldBalances(Account account) {
         try (Connection connection = getHikari().getConnection()) {
             PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + this.balancesTable + " WHERE account_id = ?");
+            stmt.setString(1, account.getUuid().toString());
+            stmt.execute();
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public void deleteDuplicateAccounts(Account account){
+        try (Connection connection = getHikari().getConnection()) {
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + this.accountsTable + " WHERE uuid = ?");
             stmt.setString(1, account.getUuid().toString());
             stmt.execute();
         }catch (SQLException ex){
