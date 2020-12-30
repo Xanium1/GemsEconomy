@@ -133,6 +133,9 @@ public class MySQLStorage extends DataStorage {
                     stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " ADD PRIMARY KEY (uuid)");
                     stmt.execute();
 
+                    stmt = getHikari().getConnection().prepareStatement("TRUNCATE TABLE " + this.accountsTable);
+                    stmt.execute();
+
                     UtilServer.consoleLog("Altered Tables " + this.accountsTable + " to support the new balance data saving");
                 }
             }
@@ -328,7 +331,6 @@ public class MySQLStorage extends DataStorage {
                 account.modifyBalance(currency, set.getDouble("balance"), false);
 
                 if(set.isLast()){
-                    deleteDuplicateAccounts(account);
                     saveAccount(account);
                     deleteOldBalances(account);
                 }
@@ -514,16 +516,6 @@ public class MySQLStorage extends DataStorage {
     public void deleteOldBalances(Account account) {
         try (Connection connection = getHikari().getConnection()) {
             PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + this.balancesTable + " WHERE account_id = ?");
-            stmt.setString(1, account.getUuid().toString());
-            stmt.execute();
-        }catch (SQLException ex){
-            ex.printStackTrace();
-        }
-    }
-
-    public void deleteDuplicateAccounts(Account account){
-        try (Connection connection = getHikari().getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + this.accountsTable + " WHERE uuid = ?");
             stmt.setString(1, account.getUuid().toString());
             stmt.execute();
         }catch (SQLException ex){
