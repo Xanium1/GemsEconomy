@@ -124,6 +124,9 @@ public class MySQLStorage extends DataStorage {
                     stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " DROP COLUMN `id`");
                     stmt.execute();
 
+                    stmt = getHikari().getConnection().prepareStatement("TRUNCATE TABLE " + this.accountsTable);
+                    stmt.execute();
+
                     stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " ADD PRIMARY KEY (uuid)");
                     stmt.execute();
 
@@ -131,9 +134,6 @@ public class MySQLStorage extends DataStorage {
                     stmt.execute();
 
                     stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " ADD PRIMARY KEY (uuid)");
-                    stmt.execute();
-
-                    stmt = getHikari().getConnection().prepareStatement("TRUNCATE TABLE " + this.accountsTable);
                     stmt.execute();
 
                     UtilServer.consoleLog("Altered Tables " + this.accountsTable + " to support the new balance data saving");
