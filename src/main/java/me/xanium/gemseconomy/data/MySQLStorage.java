@@ -61,14 +61,14 @@ public class MySQLStorage extends DataStorage {
         return GemsEconomy.getInstance().getConfig().getString("mysql.tableprefix");
     }
 
-    private void setupTables() throws SQLException {
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL PRIMARY KEY, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
+    private void setupTables(Connection connection) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.currencyTable + " (uuid VARCHAR(255) NOT NULL PRIMARY KEY, name_singular VARCHAR(255), name_plural VARCHAR(255),    default_balance DECIMAL,    symbol VARCHAR(10),    decimals_supported INT,    is_default INT,    payable INT,    color VARCHAR(255),    exchange_rate DECIMAL);")) {
             ps.execute();
         }
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.accountsTable + " (nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL PRIMARY KEY, payable INT, balance_data LONGTEXT NULL);")) {
+        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.accountsTable + " (nickname VARCHAR(255), uuid VARCHAR(255) NOT NULL PRIMARY KEY, payable INT, balance_data LONGTEXT NULL);")) {
             ps.execute();
         }
-        try (PreparedStatement ps = getHikari().getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS " + this.balancesTable + " (account_id VARCHAR(255), currency_id VARCHAR(255), balance DECIMAL);")) {
+        try (PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + this.balancesTable + " (account_id VARCHAR(255), currency_id VARCHAR(255), balance DECIMAL);")) {
             ps.execute();
         }
     }
@@ -78,7 +78,7 @@ public class MySQLStorage extends DataStorage {
         this.hikari = new HikariDataSource(this.hikariConfig);
 
         try (Connection connection = hikari.getConnection()) {
-            setupTables();
+            setupTables(connection);
 
             PreparedStatement stmt;
             Map<String, List<String>> structure = new HashMap<>();
@@ -108,7 +108,7 @@ public class MySQLStorage extends DataStorage {
             List<String> currencyTableColumns = structure.get(this.currencyTable);
             if(currencyTableColumns != null && !currencyTableColumns.isEmpty()){
                 if (!currencyTableColumns.contains("exchange_rate")) {
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " ADD exchange_rate DECIMAL NULL DEFAULT NULL AFTER `color`;");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.currencyTable + " ADD exchange_rate DECIMAL NULL DEFAULT NULL AFTER `color`;");
                     stmt.execute();
 
                     UtilServer.consoleLog("Altered Table " + this.currencyTable + " to support the new exchange_rate variable.");
@@ -118,22 +118,22 @@ public class MySQLStorage extends DataStorage {
             List<String> accountTableColumns = structure.get(this.accountsTable);
             if(accountTableColumns != null && !accountTableColumns.isEmpty()){
                 if(!accountTableColumns.contains("balance_data")){
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " ADD balance_data LONGTEXT NULL DEFAULT NULL AFTER `payable`;");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.accountsTable + " ADD balance_data LONGTEXT NULL DEFAULT NULL AFTER `payable`;");
                     stmt.execute();
 
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " DROP COLUMN `id`");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.accountsTable + " DROP COLUMN `id`");
                     stmt.execute();
 
-                    stmt = getHikari().getConnection().prepareStatement("TRUNCATE TABLE " + this.accountsTable);
+                    stmt = connection.prepareStatement("TRUNCATE TABLE " + this.accountsTable);
                     stmt.execute();
 
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.accountsTable + " ADD PRIMARY KEY (uuid)");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.accountsTable + " ADD PRIMARY KEY (uuid)");
                     stmt.execute();
 
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " DROP COLUMN `id`");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.currencyTable + " DROP COLUMN `id`");
                     stmt.execute();
 
-                    stmt = getHikari().getConnection().prepareStatement("ALTER TABLE " + this.currencyTable + " ADD PRIMARY KEY (uuid)");
+                    stmt = connection.prepareStatement("ALTER TABLE " + this.currencyTable + " ADD PRIMARY KEY (uuid)");
                     stmt.execute();
 
                     UtilServer.consoleLog("Altered Tables " + this.accountsTable + " to support the new balance data saving");
