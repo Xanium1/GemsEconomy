@@ -10,26 +10,26 @@ loadbefore:
   - ItemFrameShops
 softdepend: [Vault]
 commands:
-  balance:
+  gbalance:
     description: Shows your balances
-    usage: /balance (account)
-    aliases: [gbal, gmoney, bal]
-  baltop:
+    usage: /gbalance (account)
+    aliases: [gbal, gmoney, balance, bal]
+  gbaltop:
     description: Shows the top balances of the server
-    usage: /baltop (currency) (page)
-    aliases: [gmoneytop, gecotop, gtop, gbaltop]
+    usage: /gbaltop (currency) (page)
+    aliases: [gmoneytop, gecotop, gtop, gbaltop, baltop]
   currency:
     description: Manage the currencies.
     usage: /currency
     aliases: [gcurr, gemscurrencies, gcurrency, currencies]
-  economy:
+  geconomy:
     description: Give, set or take currency.
-    usage: /eco <set|take|give> <account> <amount> (currency)
-    aliases: [geconomy, eco, geco, gemseconomy]
-  pay:
+    usage: /geco <set|take|give> <account> <amount> (currency)
+    aliases: [economy, eco, geco, gemseconomy]
+  gpay:
     description: Pays another account
-    usage: /pay <account> <amount> (currency)
-    aliases: [gpay, gemspay]
+    usage: /gpay <account> <amount> (currency)
+    aliases: [pay, gemspay]
   cheque:
     usage: /cheque
     description: Write or Redeem a cheque.
